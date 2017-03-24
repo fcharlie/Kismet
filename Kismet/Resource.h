@@ -3,6 +3,14 @@
 // Used by Kismet.rc
 //
 
+#define VERSIONSTRING "1.0.0.0"
+#define MAJORVER 1
+#define MINORVER 0
+#define PATCHVER 0
+#define BUILDVER 0
+
+#define COPYRIGHT L"Copyright \xA9 2017 Force Charlie .All Rights Reserved."
+
 #define IDS_APP_TITLE			103
 
 #define IDR_MAINFRAME			128
