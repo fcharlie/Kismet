@@ -41,7 +41,11 @@ bool SHA256Sum(const FileSumElement &fse) {
 		rhash_sha256_update(&ctx, buffer, dwRead);
 		cmsize += dwRead;
 		auto N = cmsize * 100 / li.QuadPart;
-		fse.callback(kFilesumProgress, (uint32_t)N, L"");
+		if (!fse.callback(kFilesumProgress, (uint32_t)N, L""))
+		{
+			CloseHandle(hFile);
+			return false;
+		}
 		if (dwRead<sizeof(buffer))
 			break;
 	}
@@ -95,7 +99,11 @@ bool SHA512Sum(const FileSumElement &fse) {
 		rhash_sha512_update(&ctx, buffer, dwRead);
 		cmsize += dwRead;
 		auto N = cmsize * 100 / li.QuadPart;
-		fse.callback(kFilesumProgress, (uint32_t)N, L"");
+		if (!fse.callback(kFilesumProgress, (uint32_t)N, L""))
+		{
+			CloseHandle(hFile);
+			return false;
+		}
 		if (dwRead<sizeof(buffer))
 			break;
 	}

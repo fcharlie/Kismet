@@ -30,7 +30,11 @@ bool MD5Sum(const FileSumElement &fse) {
 		rhash_md5_update(&ctx, buffer, dwRead);
 		cmsize += dwRead;
 		auto N = cmsize * 100 / li.QuadPart;
-		fse.callback(kFilesumProgress, (uint32_t)N, L"");
+		if (!fse.callback(kFilesumProgress, (uint32_t)N, L""))
+		{
+			CloseHandle(hFile);
+			return false;
+		}
 		if (dwRead<sizeof(buffer))
 			break;
 	}
