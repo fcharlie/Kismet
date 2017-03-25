@@ -25,7 +25,7 @@ bool MD5Sum(const FilesumEm &fse) {
 	GetFileSizeEx(hFile, &li);
 	auto Ptr = reinterpret_cast<wchar_t *>(buffer);
 	_snwprintf_s(Ptr, sizeof(buffer) / 2, sizeof(buffer) / 2,
-		L"File: %s\r\nSize: %lld\r\nMD5: ", fse.file.data(), li.QuadPart);
+		L"File:\t%s\r\nSize:\t%lld\r\nMD5:\t", fse.file.data(), li.QuadPart);
 	fse.callback(kFilesumMessage, 0, Ptr);
 	for (;;) {
 		if (!ReadFile(hFile, buffer, sizeof(buffer), &dwRead, nullptr)) {

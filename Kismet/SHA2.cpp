@@ -36,7 +36,7 @@ bool SHA256Sum(const FilesumEm &fse) {
 	int64_t cmsize = 0;
 	auto Ptr = reinterpret_cast<wchar_t *>(buffer);
 	_snwprintf_s(Ptr, sizeof(buffer) / 2, sizeof(buffer) / 2,
-		L"File: %s\r\nSize: %lld\r\nSHA%d: ", fse.file.data(), li.QuadPart, fse.width);
+		L"File:\t%s\r\nSize:\t%lld\r\nSHA%d:\t", fse.file.data(), li.QuadPart, fse.width);
 	fse.callback(kFilesumMessage, 0, Ptr);
 	for (;;) {
 		if (!ReadFile(hFile, buffer, sizeof(buffer), &dwRead, nullptr)) {
@@ -98,7 +98,7 @@ bool SHA512Sum(const FilesumEm &fse) {
 	int64_t cmsize = 0;
 	auto Ptr = reinterpret_cast<wchar_t *>(buffer);
 	_snwprintf_s(Ptr, sizeof(buffer) / 2, sizeof(buffer) / 2,
-		L"File: %s\r\nSize: %lld\r\nSHA%d: ", fse.file.data(), li.QuadPart, fse.width);
+		L"File:\t%s\r\nSize:\t%lld\r\nSHA%d:\t", fse.file.data(), li.QuadPart, fse.width);
 	fse.callback(kFilesumMessage, 0, Ptr);
 	for (;;) {
 		if (!ReadFile(hFile, buffer, sizeof(buffer), &dwRead, nullptr)) {

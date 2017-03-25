@@ -44,6 +44,10 @@ public:
 		return instance_;
 	}
 	///
+	bool IsEmpty() { 
+		std::unique_lock<std::mutex> lck(mtx);
+		return filesums.empty(); 
+	}
 	bool InitializeSecureTask();
 	bool Push(FilesumEm &filesum);
 	FilesumemPtr Pop();

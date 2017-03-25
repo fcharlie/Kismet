@@ -1,6 +1,9 @@
 #include "stdafx.h"
 #include "NeonWindow.h"
 #include "Kismet.h"
+#include <cstdlib>
+#include <cctype>
+#include <algorithm>
 #include <Prsht.h>
 #include <CommCtrl.h>
 #include <Shlwapi.h>
@@ -189,38 +192,35 @@ void NeonWindow::UpdateTitle(const std::wstring & title_)
 	SetWindowTextW(xtitle.data());
 }
 
-bool FlushContent(HWND hWnd, const std::wstring &str) {
-	::SendMessageW(hWnd, EM_SETSEL, LOWORD(-1), HIWORD(-1));
-	::SendMessageW(hWnd, EM_REPLACESEL, 0, (LPARAM)(str.data()));
-	return true;
-}
+
 
 bool NeonWindow::FilesumInvoke(std::int32_t state, std::uint32_t pg, std::wstring data)
 {
 	switch (state) {
 	case kFilesumBroken:
-		canclear = true;
-		taskable = true;
 		return false;
 	case kFilesumMessage:
-		::FlushContent(hContent, data);
+		content.assign(std::move(data));
+		::SetWindowTextW(hContent, content.data());
 		return true;
 	case kFilesumCompleted:
-		::FlushContent(hContent, data);
-		canclear = true;
-		taskable = true;
+		if (Button_GetCheck(hCheck) == BST_CHECKED) {
+			std::transform(data.begin(), data.end(), data.begin(), std::toupper);
+		}
+		content.append(data);
+		::SetWindowTextW(hContent, content.data());
 		break;
 	case kFilesumCollCompleted:
-	{
-		data.append(L" **collision**");
-		::FlushContent(hContent, data);
-		canclear = true;
-		taskable = true;
-	}
+		if (Button_GetCheck(hCheck) == BST_CHECKED) {
+			std::transform(data.begin(), data.end(), data.begin(), std::toupper);
+		}
+		content.append(data).append(L" **collision**");
+		::SetWindowTextW(hContent, content.data());
 		break;
 	case kFilesumProgress:
 		progress = pg;
-		InvalidateRect(&progressRect, false);
+		InvalidateRect(nullptr, false);
+		//InvalidateRect(&progressRect, false);
 		return true;
 	}
 	return true;
@@ -375,6 +375,7 @@ LRESULT NeonWindow::OnCreate(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL & bHa
 	InitializeComboHash(hCombo);
 	progressRect = { 160, 278,250,305};
 	hBrush = CreateSolidBrush(ColorConvert(ns.bkcolor));
+	hBrushContent = CreateSolidBrush(ColorConvert(ns.fgcolor));
 	return S_OK;
 }
 
@@ -382,6 +383,9 @@ LRESULT NeonWindow::OnDestroy(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL & bH
 {
 	if (hBrush) {
 		DeleteObject(hBrush);
+	}
+	if (hBrushContent) {
+		DeleteObject(hBrushContent);
 	}
 	PostQuitMessage(0);
 	return S_OK;
@@ -414,19 +418,6 @@ LRESULT NeonWindow::OnDisplayChange(UINT nMsg, WPARAM wParam, LPARAM lParam, BOO
 	return S_OK;
 }
 
-LRESULT NeonWindow::OnDropfiles(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL & bHandled)
-{
-	HDROP hDrop = (HDROP)wParam;
-	UINT nfilecounts = DragQueryFile(hDrop, 0xFFFFFFFF, NULL, 0);
-	WCHAR dropfile_name[MAX_PATH];
-	std::vector<std::wstring> filelist;
-	for (UINT i = 0; i < nfilecounts; i++) {
-		DragQueryFileW(hDrop, i, dropfile_name, MAX_PATH);
-	}
-	DragFinish(hDrop);
-	return S_OK;
-}
-
 LRESULT NeonWindow::OnColorStatic(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL & bHandle)
 {
 	HDC hdc = (HDC)wParam;
@@ -437,40 +428,53 @@ LRESULT NeonWindow::OnColorStatic(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL 
 	}
 	else if (hControl ==hContent ) {
 		// if edit control is in dialog procedure change LRESULT to INT_PTR
-		//SetBkMode((HDC)wParam, TRANSPARENT);
-		return (LRESULT)((HRESULT)WHITE_BRUSH);
+		//SetBkMode(hdc, TRANSPARENT);
+		SetBkColor(hdc,RGB(255, 255, 255));
+		SetTextColor(hdc, RGB(0, 0, 0));
+		return (LRESULT)((HRESULT)hBrushContent);
 	}
 	return ::DefWindowProc(m_hWnd, nMsg, wParam, lParam);
 }
 
 LRESULT NeonWindow::OnContentClear(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL & bHandled)
 {
-	if (canclear) {
-		::SetWindowTextW(hContent, L"");
+	if (Securehashsum::Instance().IsEmpty()) {
+		content.clear();
+		::SetWindowTextW(hContent, content.data());
+		::InvalidateRect(hContent,nullptr,false);
 	}
+	return S_OK;
+}
+
+LRESULT NeonWindow::Filesumsave(const std::wstring &file) {
+	auto i = ComboBox_GetCurSel(hCombo);
+	if (!ComboHashValue(i, fse)) {
+		return S_OK;
+	}
+	UpdateTitle(PathFindFileNameW(file.data()));
+	fse.file = file;
+	fse.callback = [this](std::int32_t state, std::uint32_t progress_, std::wstring data) {
+		return this->FilesumInvoke(state, progress_, data);
+	};
+	Securehashsum::Instance().Push(fse);
 	return S_OK;
 }
 
 LRESULT NeonWindow::OnOpenFile(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL & bHandled)
 {
-	if (!taskable)
-		return S_OK;
 	std::wstring filename;
 	if (!KismetDiscoverWindow(m_hWnd, filename, L"Open File")) {
 		return S_OK;
 	}
-	auto i = ComboBox_GetCurSel(hCombo);
-	if (!ComboHashValue(i, fse)) {
-		return S_OK;
-	}
-   UpdateTitle(PathFindFileNameW(filename.data()));
-   fse.file = filename;
-   fse.callback = [this](std::int32_t state, std::uint32_t progress_, std::wstring data) {
-	   return this->FilesumInvoke(state, progress_, data);
-   };
-   ::SetWindowTextW(hContent, L"");
-   canclear = false;
-   taskable = false;
-   Securehashsum::Instance().Push(fse);
-	return S_OK;
+	return Filesumsave(filename);
+}
+
+LRESULT NeonWindow::OnDropfiles(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL & bHandled)
+{
+	HDROP hDrop = (HDROP)wParam;
+	WCHAR file[32267];
+	UINT nfilecounts = DragQueryFileW(hDrop, 0, file, sizeof(file));
+	DragFinish(hDrop);
+	if (nfilecounts ==0)return S_OK;
+	return Filesumsave(file);
 }

@@ -55,6 +55,7 @@ private:
 		UINT height
 	);
 	/////////// self control handle
+	LRESULT Filesumsave(const std::wstring &file);
 	void UpdateTitle(const std::wstring &title_);
 	HWND hCombo{ nullptr };
 	HWND hContent{ nullptr };
@@ -62,14 +63,14 @@ private:
 	HWND hClearButton{ nullptr };
 	HWND hCheck{ nullptr };
 	HBRUSH hBrush{ nullptr };
+	HBRUSH hBrushContent{ nullptr };
 	FilesumEm fse;
 	std::wstring title;
-	//UINT32 bkcolor = 0x87cfeb;
+	std::wstring content;
 	NeonSettings ns;
 	std::uint32_t progress{ 0 };
 	RECT progressRect;
-	bool canclear{ true };
-	bool taskable{ true };
+	std::mutex mtx;
 
 public:
 	NeonWindow(const NeonWindow &) = delete;
