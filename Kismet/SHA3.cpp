@@ -42,7 +42,7 @@ bool SHA3Sum(const FilesumEm &fse) {
 	int64_t cmsize = 0;
 	auto Ptr = reinterpret_cast<wchar_t *>(buffer);
 	_snwprintf_s(Ptr,sizeof(buffer)/2, sizeof(buffer) / 2,
-		L"File:\t%s\r\nSize:\t%lld\r\nSHA3-%d: ", fse.file.data(), li.QuadPart, fse.width);
+		L"File:\t%s\r\nSize:\t%lld\r\nS3-%d:\t", fse.file.data(), li.QuadPart, fse.width);
 	fse.callback(kFilesumMessage, 0, Ptr);
 	for (;;) {
 		if (!ReadFile(hFile, buffer, sizeof(buffer), &dwRead, nullptr)) {

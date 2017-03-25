@@ -20,7 +20,7 @@ bool SHA1Sum(const FilesumEm &fse) {
 	sha1_ctx ctx;
 	rhash_sha1_init(&ctx);
 	BYTE buffer[65536];
-	BYTE data[32];
+	BYTE data[sha1_hash_size];
 	DWORD dwRead;
 	int64_t cmsize = 0;
 	auto Ptr = reinterpret_cast<wchar_t *>(buffer);

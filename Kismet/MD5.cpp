@@ -7,7 +7,7 @@ bool MD5Sum(const FilesumEm &fse) {
 	md5_ctx ctx;
 	rhash_md5_init(&ctx);
 	BYTE buffer[65536];
-	BYTE data[16];
+	BYTE data[md5_hash_size];
 	DWORD dwRead;
 	int64_t cmsize = 0;
 	auto hFile = CreateFileW(fse.file.data(),

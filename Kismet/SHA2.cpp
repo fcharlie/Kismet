@@ -31,7 +31,7 @@ bool SHA256Sum(const FilesumEm &fse) {
 	LARGE_INTEGER li;
 	GetFileSizeEx(hFile, &li);
 	BYTE buffer[65536];
-	BYTE data[64];
+	BYTE data[sha256_hash_size];
 	DWORD dwRead;
 	int64_t cmsize = 0;
 	auto Ptr = reinterpret_cast<wchar_t *>(buffer);
@@ -73,7 +73,7 @@ bool SHA512Sum(const FilesumEm &fse) {
 	case 384:
 		rhash_sha384_init(&ctx);
 		break;
-	case 256:
+	case 512:
 		rhash_sha512_init(&ctx);
 		break;
 	default:
@@ -93,7 +93,7 @@ bool SHA512Sum(const FilesumEm &fse) {
 	LARGE_INTEGER li;
 	GetFileSizeEx(hFile, &li);
 	BYTE buffer[65536];
-	BYTE data[64];
+	BYTE data[sha512_hash_size];
 	DWORD dwRead;
 	int64_t cmsize = 0;
 	auto Ptr = reinterpret_cast<wchar_t *>(buffer);
