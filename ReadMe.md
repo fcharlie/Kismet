@@ -2,6 +2,6 @@
 
 
 ## SHA1 Collision Detection
-![image](./docs/coll.png)
+![image](./docs/images/coll.png)
 
 WORKING IN PROGRESS
