@@ -2,7 +2,7 @@
 #include "Securehash.h"
 #include "../rhash/md5.h"
 
-bool MD5Sum(const FileSumElement &fse) {
+bool MD5Sum(const FilesumEm &fse) {
 	char to_hex[] = "0123456789abcdef";
 	md5_ctx ctx;
 	rhash_md5_init(&ctx);
@@ -23,6 +23,10 @@ bool MD5Sum(const FileSumElement &fse) {
 	}
 	LARGE_INTEGER li;
 	GetFileSizeEx(hFile, &li);
+	auto Ptr = reinterpret_cast<wchar_t *>(buffer);
+	_snwprintf_s(Ptr, sizeof(buffer) / 2, sizeof(buffer) / 2,
+		L"File: %s\r\nSize: %lld\r\nMD5: ", fse.file.data(), li.QuadPart);
+	fse.callback(kFilesumMessage, 0, Ptr);
 	for (;;) {
 		if (!ReadFile(hFile, buffer, sizeof(buffer), &dwRead, nullptr)) {
 			break;

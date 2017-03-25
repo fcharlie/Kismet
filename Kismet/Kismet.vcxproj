@@ -149,6 +149,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Kismet.cpp" />
+    <ClCompile Include="KismetDiscover.cpp" />
     <ClCompile Include="MD5.cpp" />
     <ClCompile Include="NeonWindow.cpp" />
     <ClCompile Include="Securehash.cpp" />
@@ -173,6 +174,12 @@
     <ProjectReference Include="..\rhash\rhash.vcxproj">
       <Project>{3492c5d3-64d7-4031-9991-7f3bce5cfcb2}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="Kismet.manifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="kismet.ini" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

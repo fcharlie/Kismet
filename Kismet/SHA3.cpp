@@ -3,7 +3,7 @@
 #include "../rhash/sha3.h"
 
 
-bool SHA3Sum(const FileSumElement &fse) {
+bool SHA3Sum(const FilesumEm &fse) {
 	char to_hex[] = "0123456789abcdef";
 	sha3_ctx ctx;
 	switch (fse.width)
@@ -40,6 +40,10 @@ bool SHA3Sum(const FileSumElement &fse) {
 	BYTE data[sha3_512_hash_size];
 	DWORD dwRead;
 	int64_t cmsize = 0;
+	auto Ptr = reinterpret_cast<wchar_t *>(buffer);
+	_snwprintf_s(Ptr,sizeof(buffer)/2, sizeof(buffer) / 2,
+		L"File: %s\r\nSize: %lld\r\nSHA3-%d: ", fse.file.data(), li.QuadPart, fse.width);
+	fse.callback(kFilesumMessage, 0, Ptr);
 	for (;;) {
 		if (!ReadFile(hFile, buffer, sizeof(buffer), &dwRead, nullptr)) {
 			break;

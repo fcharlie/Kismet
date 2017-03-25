@@ -2,7 +2,7 @@
 #include "Securehash.h"
 #include "../rhash/sha1detectcoll.h"
 
-bool SHA1Sum(const FileSumElement &fse) {
+bool SHA1Sum(const FilesumEm &fse) {
 	char to_hex[] = "0123456789abcdef";
 	auto hFile = CreateFileW(fse.file.data(),
 		GENERIC_READ,
@@ -20,9 +20,13 @@ bool SHA1Sum(const FileSumElement &fse) {
 	SHA1_CTX ctx;
 	SHA1DCInit(&ctx);
 	BYTE buffer[65536];
-	BYTE data[20];
+	BYTE data[32];
 	DWORD dwRead;
 	int64_t cmsize = 0;
+	auto Ptr = reinterpret_cast<wchar_t *>(buffer);
+	_snwprintf_s(Ptr, sizeof(buffer) / 2, sizeof(buffer) / 2,
+		L"File: %s\r\nSize: %lld\r\nSHA1: ", fse.file.data(), li.QuadPart);
+	fse.callback(kFilesumMessage, 0, Ptr);
 	for (;;) {
 		if (!ReadFile(hFile, buffer, sizeof(buffer), &dwRead, nullptr)) {
 			break;
@@ -39,7 +43,9 @@ bool SHA1Sum(const FileSumElement &fse) {
 			break;
 	}
 	CloseHandle(hFile);
-	bool detect = (SHA1DCFinal(data, &ctx) == 0);
+	bool detect = false;
+	if (SHA1DCFinal(data, &ctx) != 0)
+		detect = true;
 	std::wstring hex;
 	for (uint32_t i = 0; i < 20; i++) {
 		unsigned int val = data[i];

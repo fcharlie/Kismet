@@ -20,19 +20,20 @@ enum FilesumAlm {
 
 enum FilesumState {
 	kFilesumNone,
+	kFilesumMessage,
 	kFilesumProgress,
 	kFilesumCompleted,
 	kFilesumCollCompleted,/// check result DC
 	kFilesumBroken
 };
 
-struct FileSumElement {
+struct FilesumEm {
 	std::wstring file;/// file path
 	std::uint32_t alm;/// 
 	std::uint32_t width;///224 256 384 512
 	std::function<bool(std::int32_t state,std::uint32_t progress,std::wstring data)> callback;/// if false , skip
 };
-typedef std::shared_ptr<FileSumElement> FileSumElementPtr;
+typedef std::shared_ptr<FilesumEm> FilesumemPtr;
 
 class Securehashsum {
 public:
@@ -44,20 +45,15 @@ public:
 	}
 	///
 	bool InitializeSecureTask();
-	bool Push(FileSumElement &filesum);
-	FileSumElementPtr Pop();
+	bool Push(FilesumEm &filesum);
+	FilesumemPtr Pop();
 private:
 	Securehashsum() = default;
-	std::queue<FileSumElementPtr> filesums;
+	std::queue<FilesumemPtr> filesums;
 	std::mutex mtx;
 	std::condition_variable condv;
 	DWORD tid{ 0 };
 	HANDLE hThread{ nullptr };
-};
-
-class Securehash {
-public:
-private:
 };
 
 #endif

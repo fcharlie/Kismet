@@ -1,12 +1,12 @@
 #include "stdafx.h"
 #include "Securehash.h"
 
-bool MD5Sum(const FileSumElement &fse);
-bool SHA1Sum(const FileSumElement &fse);
-bool SHA2Sum(const FileSumElement &fse);
-bool SHA3Sum(const FileSumElement &fse);
+bool MD5Sum(const FilesumEm &fse);
+bool SHA1Sum(const FilesumEm &fse);
+bool SHA2Sum(const FilesumEm &fse);
+bool SHA3Sum(const FilesumEm &fse);
 
-bool KitmetSecureCore(const FileSumElement &fse) {
+bool KitmetSecureCore(const FilesumEm &fse) {
 	switch (fse.alm) {
 	case kFilesumMD5:
 		return MD5Sum(fse);
@@ -43,15 +43,15 @@ bool Securehashsum::InitializeSecureTask() {
 	return true;
 }
 
-bool Securehashsum::Push(FileSumElement &filesum) {
+bool Securehashsum::Push(FilesumEm &filesum) {
 	std::unique_lock<std::mutex> lck(mtx);
-	FileSumElementPtr ptr(new FileSumElement(filesum));
+	FilesumemPtr ptr(new FilesumEm(filesum));
 	filesums.push(std::move(ptr));
 	condv.notify_one();
 	return true;
 }
 
-FileSumElementPtr Securehashsum::Pop() {
+FilesumemPtr Securehashsum::Pop() {
 	std::unique_lock<std::mutex> lck(mtx);
 	if (filesums.empty()) {
 		/// mutex is unlock by wait

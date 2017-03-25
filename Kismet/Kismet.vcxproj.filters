@@ -59,6 +59,9 @@
     <ClCompile Include="SHA3.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="KismetDiscover.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Kismet.rc">
@@ -75,5 +78,15 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="Kismet.manifest">
+      <Filter>资源文件</Filter>
+    </Manifest>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="kismet.ini">
+      <Filter>源文件</Filter>
+    </None>
   </ItemGroup>
 </Project>
