@@ -141,6 +141,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Kismet.h" />
+    <ClInclude Include="MessageWindow.h" />
     <ClInclude Include="NeonWindow.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Securehash.h" />
@@ -151,6 +152,7 @@
     <ClCompile Include="Kismet.cpp" />
     <ClCompile Include="KismetDiscover.cpp" />
     <ClCompile Include="MD5.cpp" />
+    <ClCompile Include="MessageWindow.cpp" />
     <ClCompile Include="NeonWindow.cpp" />
     <ClCompile Include="Securehash.cpp" />
     <ClCompile Include="SHA1.cpp" />

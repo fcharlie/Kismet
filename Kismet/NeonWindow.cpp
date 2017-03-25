@@ -1,6 +1,4 @@
 #include "stdafx.h"
-#include "NeonWindow.h"
-#include "Kismet.h"
 #include <cstdlib>
 #include <cctype>
 #include <algorithm>
@@ -11,6 +9,11 @@
 #include <PathCch.h>
 #include <Windowsx.h>
 #include <Mmsystem.h>
+#include "Kismet.h"
+#include "NeonWindow.h"
+#include "MessageWindow.h"
+
+
 
 #ifndef HINST_THISCOMPONENT
 EXTERN_C IMAGE_DOS_HEADER __ImageBase;
@@ -380,6 +383,8 @@ LRESULT NeonWindow::OnCreate(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL & bHa
 	progressRect = { 160, 278,250,305};
 	hBrush = CreateSolidBrush(ColorConvert(ns.bkcolor));
 	hBrushContent = CreateSolidBrush(ColorConvert(ns.fgcolor));
+	HMENU hSystemMenu = ::GetSystemMenu(m_hWnd, FALSE);
+	InsertMenuW(hSystemMenu, SC_CLOSE, MF_ENABLED, IDM_SYSTEM_ABOUT, L"About Kismet\tAlt+F1");
 	return S_OK;
 }
 
@@ -445,7 +450,9 @@ LRESULT NeonWindow::OnContentClear(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOO
 	if (Securehashsum::Instance().IsEmpty()) {
 		content.clear();
 		::SetWindowTextW(hContent, content.data());
-		::InvalidateRect(hContent,nullptr,false);
+		progress = 0;
+		UpdateTitle(L"");
+		InvalidateRect(nullptr, false);
 	}
 	return S_OK;
 }
@@ -471,6 +478,17 @@ LRESULT NeonWindow::OnOpenFile(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL & 
 		return S_OK;
 	}
 	return Filesumsave(filename);
+}
+
+LRESULT NeonWindow::OnAbout(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL & bHandled)
+{
+	MessageWindowEx(
+		m_hWnd,
+		L"About Kismet utilities",
+		L"Prerelease: 1.0.0.0\nCopyright \xA9 2017, Force Charlie. All Rights Reserved.",
+		L"For more information about this tool.\nVisit: <a href=\"http://forcemz.net/\">forcemz.net</a>",
+		kAboutWindow);
+	return S_OK;
 }
 
 LRESULT NeonWindow::OnDropfiles(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL & bHandled)

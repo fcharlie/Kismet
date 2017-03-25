@@ -32,6 +32,17 @@ inline COLORREF ColorConvert(UINT32 cr) {
 
 #define NEONWINDOWNAME L"Neon.UI.Window"
 
+#ifndef SYSCOMMAND_ID_HANDLER
+#define SYSCOMMAND_ID_HANDLER(id, func) \
+	if(uMsg == WM_SYSCOMMAND && id == LOWORD(wParam)) \
+					{ \
+		bHandled = TRUE; \
+		lResult = func(HIWORD(wParam), LOWORD(wParam), (HWND)lParam, bHandled); \
+		if(bHandled) \
+			return TRUE; \
+					}
+#endif
+
 #define NEON_WINDOW_CLASSSTYLE WS_OVERLAPPED | WS_SYSMENU | \
 WS_MINIMIZEBOX | WS_CLIPCHILDREN | WS_CLIPSIBLINGS&~WS_MAXIMIZEBOX
 typedef CWinTraits<NEON_WINDOW_CLASSSTYLE, WS_EX_APPWINDOW | WS_EX_WINDOWEDGE> CMetroWindowTraits;
@@ -90,6 +101,7 @@ public:
 		MESSAGE_HANDLER(WM_DESTROY, OnDestroy)
 		COMMAND_ID_HANDLER(IDC_CLEAR_BUTTON, OnContentClear)
 		COMMAND_ID_HANDLER(IDC_FILEOPEN_BUTTON, OnOpenFile)
+		SYSCOMMAND_ID_HANDLER(IDM_SYSTEM_ABOUT,OnAbout)
 	END_MSG_MAP()
 	LRESULT OnCreate(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandle);
 	LRESULT OnDestroy(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandle);
@@ -101,6 +113,7 @@ public:
 	LRESULT OnColorStatic(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandle);
 	LRESULT OnContentClear(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnOpenFile(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnAbout(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	bool FilesumInvoke(std::int32_t state, std::uint32_t progress_, std::wstring data);
 };
 
