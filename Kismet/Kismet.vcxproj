@@ -154,6 +154,7 @@
     <ClCompile Include="NeonWindow.cpp" />
     <ClCompile Include="Securehash.cpp" />
     <ClCompile Include="SHA1.cpp" />
+    <ClCompile Include="SHA1DC.cpp" />
     <ClCompile Include="SHA2.cpp" />
     <ClCompile Include="SHA3.cpp" />
     <ClCompile Include="stdafx.cpp">

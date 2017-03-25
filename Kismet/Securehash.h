@@ -12,7 +12,8 @@
 
 enum FilesumAlm {
 	kFilesumMD5,
-	kFilesumSHA1,/// sha1 collision detection
+	kFilesumSHA1,
+	kFilesumSHA1DC,/// sha1 collision detection
 	kFilesumSHA2,
 	kFilesumSHA3,
 	kFilesumCRC32,

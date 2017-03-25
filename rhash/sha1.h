@@ -1,7 +1,7 @@
 /* sha1.h */
 #ifndef SHA1_H
 #define SHA1_H
-#include "ustd.h"
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {

@@ -214,7 +214,7 @@ bool NeonWindow::FilesumInvoke(std::int32_t state, std::uint32_t pg, std::wstrin
 		if (Button_GetCheck(hCheck) == BST_CHECKED) {
 			std::transform(data.begin(), data.end(), data.begin(), std::toupper);
 		}
-		content.append(data).append(L" **collision**");
+		content.append(data).append(L" *coll*");
 		::SetWindowTextW(hContent, content.data());
 		break;
 	case kFilesumProgress:
@@ -232,6 +232,7 @@ inline bool InitializeComboHash(HWND hWnd) {
 	const wchar_t *hash[] = {
 		L"MD5",
 		L"SHA1",
+		L"SHA1 - Coll",
 		L"SHA224",
 		L"SHA256",
 		L"SHA384",
@@ -258,34 +259,37 @@ inline bool ComboHashValue(int i, FilesumEm &fse) {
 		fse.alm = kFilesumSHA1;
 		break;
 	case 2:
-		fse.alm = kFilesumSHA2;
-		fse.width = 224;
+		fse.alm = kFilesumSHA1DC;
 		break;
 	case 3:
 		fse.alm = kFilesumSHA2;
-		fse.width = 256;
+		fse.width = 224;
 		break;
 	case 4:
 		fse.alm = kFilesumSHA2;
-		fse.width = 384;
+		fse.width = 256;
 		break;
 	case 5:
 		fse.alm = kFilesumSHA2;
-		fse.width = 512;
+		fse.width = 384;
 		break;
 	case 6:
-		fse.alm = kFilesumSHA3;
-		fse.width = 224;
+		fse.alm = kFilesumSHA2;
+		fse.width = 512;
 		break;
 	case 7:
 		fse.alm = kFilesumSHA3;
-		fse.width = 256;
+		fse.width = 224;
 		break;
 	case 8:
 		fse.alm = kFilesumSHA3;
-		fse.width = 384;
+		fse.width = 256;
 		break;
 	case 9:
+		fse.alm = kFilesumSHA3;
+		fse.width = 384;
+		break;
+	case 10:
 		fse.alm = kFilesumSHA3;
 		fse.width = 512;
 		break;

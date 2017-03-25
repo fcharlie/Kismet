@@ -3,6 +3,7 @@
 
 bool MD5Sum(const FilesumEm &fse);
 bool SHA1Sum(const FilesumEm &fse);
+bool SHA1DCSum(const FilesumEm &fse);
 bool SHA2Sum(const FilesumEm &fse);
 bool SHA3Sum(const FilesumEm &fse);
 
@@ -12,6 +13,8 @@ bool KitmetSecureCore(const FilesumEm &fse) {
 		return MD5Sum(fse);
 	case kFilesumSHA1:
 		return SHA1Sum(fse);
+	case kFilesumSHA1DC:
+		return  SHA1DCSum(fse);
 	case kFilesumSHA2:
 		return SHA2Sum(fse);
 	case kFilesumSHA3:

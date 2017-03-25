@@ -62,6 +62,9 @@
     <ClCompile Include="KismetDiscover.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="SHA1DC.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Kismet.rc">
