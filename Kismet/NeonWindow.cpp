@@ -381,8 +381,8 @@ LRESULT NeonWindow::OnCreate(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL & bHa
 
 	InitializeComboHash(hCombo);
 	progressRect = { 160, 278,250,305};
-	hBrush = CreateSolidBrush(ColorConvert(ns.bkcolor));
-	hBrushContent = CreateSolidBrush(ColorConvert(ns.fgcolor));
+	hBrush = CreateSolidBrush(LEColorConvert(ns.bkcolor));
+	hBrushContent = CreateSolidBrush(LEColorConvert(ns.fgcolor));
 	HMENU hSystemMenu = ::GetSystemMenu(m_hWnd, FALSE);
 	InsertMenuW(hSystemMenu, SC_CLOSE, MF_ENABLED, IDM_SYSTEM_ABOUT, L"About Kismet\tAlt+F1");
 	return S_OK;

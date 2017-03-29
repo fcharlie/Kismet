@@ -13,6 +13,8 @@
 #include "Securehash.h"
 #include "Kismet.h"
 
+
+
 struct NeonSettings {
 	/// color
 	std::uint32_t bkcolor{ 0x87cfeb };
@@ -26,7 +28,8 @@ bool KismetDiscoverWindow(
 	const wchar_t *pszWindowTitle);
 
 //// what's fuck HEX color and COLORREF color, red <-- --> blue
-inline COLORREF ColorConvert(UINT32 cr) {
+//// this is LE CPU, BE CPU don't call 
+inline COLORREF LEColorConvert(UINT32 cr) {
 	return RGB(GetBValue(cr), GetGValue(cr),  GetRValue(cr));
 }
 
