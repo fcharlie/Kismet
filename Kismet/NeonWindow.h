@@ -27,10 +27,14 @@ bool KismetDiscoverWindow(
 	std::wstring &filename,
 	const wchar_t *pszWindowTitle);
 
+
 //// what's fuck HEX color and COLORREF color, red <-- --> blue
 //// this is LE CPU, BE CPU don't call 
-inline COLORREF LEColorConvert(UINT32 cr) {
-	return RGB(GetBValue(cr), GetGValue(cr),  GetRValue(cr));
+inline COLORREF calcLuminance(UINT32 cr) {
+	int r = (cr & 0xff0000) >> 16;
+	int g = (cr & 0xff00) >> 8;
+	int b = (cr & 0xff);
+	return RGB(r,g,b);
 }
 
 #define NEONWINDOWNAME L"Neon.UI.Window"

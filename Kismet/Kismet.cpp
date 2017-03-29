@@ -12,7 +12,7 @@
 /// rgb(12,54,152)
 bool MatchColorValue(const std::wstring &va,std::uint32_t &color) {
 	unsigned r, g, b;
-	_snwscanf(va.data(), va.size(), LR"(rgb(%d,%d,%d)", &r, &g, &b);
+	_snwscanf_s(va.data(), va.size(), LR"(rgb(%d,%d,%d)", &r, &g, &b);
 	wchar_t buf[16];
 	_snwprintf_s(buf, sizeof(buf), L"%02x%02x%02x", r, g, b);
 	wchar_t *c=nullptr;
