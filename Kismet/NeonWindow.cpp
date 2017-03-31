@@ -502,6 +502,15 @@ LRESULT NeonWindow::OnOpenFile(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL & 
 	return Filesumsave(filename);
 }
 
+static COLORREF CustColors[] =
+{
+	RGB(255,255,255),RGB(255,255,255),RGB(255,255,255),RGB(255,255,255),
+	RGB(255,255,255),RGB(255,255,255),RGB(255,255,255),RGB(255,255,255),
+	RGB(255,255,255),RGB(255,255,255),RGB(255,255,255),RGB(255,255,255),
+	RGB(255,255,255),RGB(255,255,255),RGB(255,255,255),RGB(255,255,255),
+};
+
+
 LRESULT NeonWindow::OnTheme(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL & bHandled)
 {
 	auto color = calcLuminance(ns.bkcolor);
@@ -509,7 +518,7 @@ LRESULT NeonWindow::OnTheme(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL & bHa
 	ZeroMemory(&co, sizeof(co));
 	co.lStructSize = sizeof(CHOOSECOLOR);
 	co.hwndOwner = m_hWnd;
-	co.lpCustColors = &color;
+	co.lpCustColors = CustColors;
 	co.rgbResult = calcLuminance(ns.bkcolor);
 	co.lCustData = 0;
 	co.lpTemplateName = nullptr;
