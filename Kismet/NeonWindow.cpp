@@ -518,12 +518,12 @@ LRESULT NeonWindow::OnTheme(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL & bHa
 	ZeroMemory(&co, sizeof(co));
 	co.lStructSize = sizeof(CHOOSECOLOR);
 	co.hwndOwner = m_hWnd;
-	co.lpCustColors = CustColors;
+	co.lpCustColors = (LPDWORD)CustColors;
 	co.rgbResult = calcLuminance(ns.bkcolor);
 	co.lCustData = 0;
 	co.lpTemplateName = nullptr;
 	co.lpfnHook = nullptr;
-	co.Flags = CC_RGBINIT;
+	co.Flags = CC_FULLOPEN | CC_RGBINIT;
 	if (ChooseColor(&co))
 	{
 		auto r = GetRValue(co.rgbResult);
