@@ -9,26 +9,28 @@
 #include <wchar.h>
 #include "NeonWindow.h"
 
-/// rgb(12,54,152)
-bool MatchColorValue(const std::wstring &va,std::uint32_t &color) {
-	unsigned r, g, b;
-	_snwscanf_s(va.data(), va.size(), LR"(rgb(%d,%d,%d)", &r, &g, &b);
+/// rgb(12,54,152) rgb to hex
+bool RgbColorValue(const std::wstring &va,std::uint32_t &color) {
+	unsigned r=0, g=0, b=0;
+	if (_snwscanf_s(va.data(), va.size(), LR"(rgb(%d,%d,%d)", &r, &g, &b) != 3)
+		return false;
 	color = (r << 16) + (g << 8) + b;
 	return true;
 }
 
 /// LR"(rgb\(\w+,\w+,\w+\))"
-std::uint32_t InitializeColorValue(const std::wstring &cs) {
+
+
+bool InitializeColorValue(const std::wstring &cs,std::uint32_t &va) {
 	if (cs.front() == L'#') {
 		wchar_t *c = nullptr;
-		return wcstol(cs.data()+1, &c, 16);
+		va= wcstol(cs.data()+1, &c, 16);
+		return true;
 	}
 	else if (cs.front() == L'r') {
-		std::uint32_t va;
-		MatchColorValue(cs.data(), va);
-		return va;
+		return RgbColorValue(cs.data(), va);
 	}
-	return UINT32_MAX; ///invalid color
+	return false; 
 }
 
 class DotComInitialize {
@@ -43,6 +45,11 @@ public:
 	}
 };
 
+bool UpdateWindowSettings(NeonSettings &ns) {
+
+	return true;
+}
+
 int NeonWindowLoop()
 {
 	INITCOMMONCONTROLSEX info = { sizeof(INITCOMMONCONTROLSEX),
@@ -50,6 +57,7 @@ int NeonWindowLoop()
 	InitCommonControlsEx(&info);
 	NeonWindow window;
 	MSG msg;
+	UpdateWindowSettings(window.Settings());
 	window.InitializeWindow();
 	window.ShowWindow(SW_SHOW);
 	window.UpdateWindow();

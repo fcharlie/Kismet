@@ -17,4 +17,9 @@ SHA1 Collision
 
 ![complete](./docs/images/complete.png)
 
+
+## Theme
+
+![Theme](./docs/images/theme.png)
+
 WORKING IN PROGRESS

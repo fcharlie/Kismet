@@ -75,6 +75,7 @@ private:
 	/////////// self control handle
 	LRESULT Filesumsave(const std::wstring &file);
 	void UpdateTitle(const std::wstring &title_);
+	bool UpdateTheme();
 	HWND hCombo{ nullptr };
 	HWND hContent{ nullptr };
 	HWND hOpenButton{ nullptr };
@@ -95,6 +96,7 @@ public:
 	NeonWindow &operator=(const NeonWindow &) = delete;
 	NeonWindow();
 	~NeonWindow();
+	NeonSettings &Settings() { return ns; }
 	LRESULT InitializeWindow();
 	DECLARE_WND_CLASS(NEONWINDOWNAME)
 	BEGIN_MSG_MAP(MetroWindow)
@@ -108,7 +110,8 @@ public:
 		MESSAGE_HANDLER(WM_DESTROY, OnDestroy)
 		COMMAND_ID_HANDLER(IDC_CLEAR_BUTTON, OnContentClear)
 		COMMAND_ID_HANDLER(IDC_FILEOPEN_BUTTON, OnOpenFile)
-		SYSCOMMAND_ID_HANDLER(IDM_SYSTEM_ABOUT,OnAbout)
+		SYSCOMMAND_ID_HANDLER(IDM_CHANGE_THEME,OnTheme)
+		SYSCOMMAND_ID_HANDLER(IDM_KISMET_INFO,OnAbout)
 	END_MSG_MAP()
 	LRESULT OnCreate(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandle);
 	LRESULT OnDestroy(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandle);
@@ -120,6 +123,7 @@ public:
 	LRESULT OnColorStatic(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandle);
 	LRESULT OnContentClear(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnOpenFile(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnTheme(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnAbout(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	bool FilesumInvoke(std::int32_t state, std::uint32_t progress_, std::wstring data);
 };

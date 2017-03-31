@@ -9,6 +9,7 @@
 #include <PathCch.h>
 #include <Windowsx.h>
 #include <Mmsystem.h>
+#include <commdlg.h>
 #include "Kismet.h"
 #include "NeonWindow.h"
 #include "MessageWindow.h"
@@ -193,6 +194,26 @@ void NeonWindow::UpdateTitle(const std::wstring & title_)
 		xtitle.append(L" - ").append(title_);
 	}
 	SetWindowTextW(xtitle.data());
+}
+
+bool NeonWindow::UpdateTheme()
+{
+	if (hBrush) {
+		DeleteObject(hBrush);
+	}
+	hBrush = CreateSolidBrush(calcLuminance(ns.bkcolor));
+	if (hBrushContent) {
+		DeleteObject(hBrushContent);
+	}
+	SafeRelease(&m_pBackgroundBrush);
+	auto hr = m_pHwndRenderTarget->CreateSolidColorBrush(
+		D2D1::ColorF((UINT32)ns.bkcolor),
+		&m_pBackgroundBrush
+	);
+	hBrushContent=CreateSolidBrush(calcLuminance(ns.fgcolor));
+	::InvalidateRect(hCheck, nullptr, TRUE);
+	InvalidateRect(nullptr, TRUE);
+	return true;
 }
 
 
@@ -384,7 +405,8 @@ LRESULT NeonWindow::OnCreate(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL & bHa
 	hBrush = CreateSolidBrush(calcLuminance(ns.bkcolor));
 	hBrushContent = CreateSolidBrush(calcLuminance(ns.fgcolor));
 	HMENU hSystemMenu = ::GetSystemMenu(m_hWnd, FALSE);
-	InsertMenuW(hSystemMenu, SC_CLOSE, MF_ENABLED, IDM_SYSTEM_ABOUT, L"About Kismet\tAlt+F1");
+	InsertMenuW(hSystemMenu, SC_CLOSE, MF_ENABLED, IDM_CHANGE_THEME, L"Theme");
+	InsertMenuW(hSystemMenu, SC_CLOSE, MF_ENABLED, IDM_KISMET_INFO, L"About Kismet\tAlt+F1");
 	return S_OK;
 }
 
@@ -478,6 +500,30 @@ LRESULT NeonWindow::OnOpenFile(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL & 
 		return S_OK;
 	}
 	return Filesumsave(filename);
+}
+
+LRESULT NeonWindow::OnTheme(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL & bHandled)
+{
+	auto color = calcLuminance(ns.bkcolor);
+	CHOOSECOLOR co;
+	ZeroMemory(&co, sizeof(co));
+	co.lStructSize = sizeof(CHOOSECOLOR);
+	co.hwndOwner = m_hWnd;
+	co.lpCustColors = &color;
+	co.rgbResult = calcLuminance(ns.bkcolor);
+	co.lCustData = 0;
+	co.lpTemplateName = nullptr;
+	co.lpfnHook = nullptr;
+	co.Flags = CC_RGBINIT;
+	if (ChooseColor(&co))
+	{
+		auto r = GetRValue(co.rgbResult);
+		auto g = GetGValue(co.rgbResult);
+		auto b = GetBValue(co.rgbResult);
+		ns.bkcolor = (r << 16) + (g << 8) + b;
+		UpdateTheme();
+	}
+	return S_OK;
 }
 
 LRESULT NeonWindow::OnAbout(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL & bHandled)
