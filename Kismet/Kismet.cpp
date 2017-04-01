@@ -7,6 +7,7 @@
 #include <commdlg.h>
 #include <regex>
 #include <wchar.h>
+#include <PathCch.h>
 #include "NeonWindow.h"
 
 /// rgb(12,54,152) rgb to hex
@@ -45,14 +46,38 @@ public:
 	}
 };
 
+std::wstring PathCombineWithExe(const std::wstring &file) {
+	std::wstring path(PATHCCH_MAX_CCH, L'\0');
+	auto N=GetModuleFileNameW(nullptr, &path[0], path.size());
+	path.resize(N);
+	auto buf = &path[0];
+	if (!PathRemoveFileSpecW(buf)) {
+		return L"";
+	}
+	path.resize(wcslen(buf));
+	path.append(L"\\").append(file);
+	return path;
+}
+
 bool ApplyWindowSettings(NeonSettings &ns) {
-	///
-	///WritePrivateProfileStringW()
+	auto file = PathCombineWithExe(L"kismet.ini");
+	if (!PathFileExistsW(file.data()))
+		return false;
+	wchar_t colorbuf[20];
+	swprintf_s(colorbuf, L"#%06X", ns.bkcolor);
+	WritePrivateProfileStringW(L"Window", L"Background", colorbuf, file.data());
+	swprintf_s(colorbuf, L"#%06X", ns.fgcolor);
+	WritePrivateProfileStringW(L"Window", L"Foreground", colorbuf, file.data());
 	return true;
 }
 
 bool UpdateWindowSettings(NeonSettings &ns) {
-	///
+	auto file = PathCombineWithExe(L"kismet.ini");
+	if (file.empty())
+		return false;
+	if (!PathFileExistsW(file.data()))
+		return false;
+	wchar_t colorbuf[20];
 	///GetPrivateProfileStringW()
 	return true;
 }

@@ -60,8 +60,10 @@ LRESULT NeonWindow::InitializeWindow()
 {
 	HRESULT  hr = E_FAIL;
 	RECT layout = { 100, 100,800, 470 };
-	title.assign(L"Kismet Neon");
-	Create(nullptr, layout, title.data(),
+	if (ns.title.empty()) {
+		ns.title.assign(L"Kismet Neon");
+	}
+	Create(nullptr, layout, ns.title.data(),
 		WS_NORESIZEWINDOW,
 		WS_EX_APPWINDOW | WS_EX_WINDOWEDGE);
 	Securehashsum::Instance().InitializeSecureTask();
@@ -189,7 +191,7 @@ void NeonWindow::OnResize(
 
 void NeonWindow::UpdateTitle(const std::wstring & title_)
 {
-	std::wstring xtitle = title;
+	std::wstring xtitle = ns.title;
 	if (!title_.empty()) {
 		xtitle.append(L" - ").append(title_);
 	}
@@ -402,7 +404,6 @@ LRESULT NeonWindow::OnCreate(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL & bHa
 		HMENU(IDC_FILEOPEN_BUTTON));
 
 	InitializeComboHash(hCombo);
-	progressRect = { 160, 278,250,305};
 	hBrush = CreateSolidBrush(calcLuminance(ns.bkcolor));
 	hBrushContent = CreateSolidBrush(calcLuminance(ns.fgcolor));
 	HMENU hSystemMenu = ::GetSystemMenu(m_hWnd, FALSE);

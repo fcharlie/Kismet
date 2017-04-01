@@ -19,6 +19,7 @@ struct NeonSettings {
 	/// color
 	std::uint32_t bkcolor{ 0xfec418 };
 	std::uint32_t fgcolor{ 0xffffff };
+	std::wstring title;
 };
 
 
@@ -83,13 +84,12 @@ private:
 	HWND hCheck{ nullptr };
 	HBRUSH hBrush{ nullptr };
 	HBRUSH hBrushContent{ nullptr };
-	FilesumEm fse;
-	std::wstring title;
-	std::wstring content;
 	NeonSettings ns;
-	std::uint32_t progress{ 0 };
-	RECT progressRect;
+	FilesumEm fse;
 	std::mutex mtx;
+	std::wstring content;
+	std::uint32_t progress{ 0 };
+
 
 public:
 	NeonWindow(const NeonWindow &) = delete;
