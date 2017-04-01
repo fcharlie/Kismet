@@ -141,7 +141,7 @@ HRESULT NeonWindow::OnRender() {
 			auto size = m_pHwndRenderTarget->GetSize();
 			m_pHwndRenderTarget->BeginDraw();
 			m_pHwndRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
-			m_pHwndRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::White, 1.0f));
+			m_pHwndRenderTarget->Clear(D2D1::ColorF(ns.fgcolor));
 			m_pHwndRenderTarget->FillRectangle(
 				D2D1::RectF(0,250,800.0,480.0),
 				m_pBackgroundBrush);
@@ -326,7 +326,8 @@ inline bool ComboHashValue(int i, FilesumEm &fse) {
 
 #define WINDOWEXSTYLE WS_EX_LEFT | WS_EX_LTRREADING | WS_EX_RIGHTSCROLLBAR | WS_EX_NOPARENTNOTIFY
 #define EDITBOXSTYLE  WS_CHILDWINDOW | WS_CLIPSIBLINGS | WS_VISIBLE |WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL
-#define PUSHBUTTONSTYLE BS_PUSHBUTTON | BS_TEXT | WS_CHILD | WS_OVERLAPPED | WS_VISIBLE
+#define PUSHBUTTONSTYLE BS_PUSHBUTTON |BS_FLAT|BS_TEXT | WS_CHILD | WS_OVERLAPPED | WS_VISIBLE
+//|BS_OWNERDRAW
 #define CHECKBOXSTYLE BS_PUSHBUTTON | BS_TEXT | BS_DEFPUSHBUTTON | BS_CHECKBOX | BS_AUTOCHECKBOX | WS_CHILD | WS_OVERLAPPED | WS_VISIBLE
 #define COMBOBOXSTYLE WS_CHILDWINDOW | WS_CLIPSIBLINGS | WS_VISIBLE | WS_TABSTOP | CBS_DROPDOWNLIST  | CBS_HASSTRINGS
 
@@ -396,7 +397,7 @@ LRESULT NeonWindow::OnCreate(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL & bHa
 
 	hOpenButton = LambdaCreateWindow(WC_BUTTONW, 
 		L"Open", 
-		PUSHBUTTONSTYLE, 
+		PUSHBUTTONSTYLE,
 		rect.right-rect.left-160, 275, 120, 27, 
 		HMENU(IDC_FILEOPEN_BUTTON));
 
@@ -459,12 +460,20 @@ LRESULT NeonWindow::OnColorStatic(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL 
 	}
 	else if (hControl ==hContent ) {
 		// if edit control is in dialog procedure change LRESULT to INT_PTR
-		//SetBkMode(hdc, TRANSPARENT);
+		SetBkMode(hdc, TRANSPARENT);
 		SetBkColor(hdc,RGB(255, 255, 255));
 		SetTextColor(hdc, RGB(0, 0, 0));
 		return (LRESULT)((HRESULT)hBrushContent);
 	}
 	return ::DefWindowProc(m_hWnd, nMsg, wParam, lParam);
+}
+
+LRESULT NeonWindow::OnColorButton(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL & bHandle)
+{
+	HDC hdc = (HDC)wParam;
+	SetTextColor(hdc, RGB(0, 0, 0));
+	SetBkMode(hdc,TRANSPARENT);
+	return (LRESULT)((HRESULT)hBrush);
 }
 
 LRESULT NeonWindow::OnContentClear(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL & bHandled)

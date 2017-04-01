@@ -17,7 +17,7 @@
 
 struct NeonSettings {
 	/// color
-	std::uint32_t bkcolor{ 0x87cfeb };
+	std::uint32_t bkcolor{ 0xfec418 };
 	std::uint32_t fgcolor{ 0xffffff };
 };
 
@@ -121,6 +121,7 @@ public:
 	LRESULT OnDisplayChange(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL & bHandled);
 	LRESULT OnDropfiles(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL & bHandled);
 	LRESULT OnColorStatic(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandle);
+	LRESULT OnColorButton(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandle);
 	LRESULT OnContentClear(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnOpenFile(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnTheme(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);

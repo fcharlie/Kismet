@@ -45,8 +45,15 @@ public:
 	}
 };
 
-bool UpdateWindowSettings(NeonSettings &ns) {
+bool ApplyWindowSettings(NeonSettings &ns) {
+	///
+	///WritePrivateProfileStringW()
+	return true;
+}
 
+bool UpdateWindowSettings(NeonSettings &ns) {
+	///
+	///GetPrivateProfileStringW()
 	return true;
 }
 
