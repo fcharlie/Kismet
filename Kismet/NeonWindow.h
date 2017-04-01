@@ -17,8 +17,8 @@
 
 struct NeonSettings {
 	/// color
-	std::uint32_t bkcolor{ 0xfec418 };
-	std::uint32_t fgcolor{ 0xffffff };
+	std::uint32_t panelcolor{ 0xfec418 };
+	std::uint32_t revealcolor{ 0xffffff };
 	std::wstring title;
 };
 

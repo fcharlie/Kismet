@@ -117,7 +117,7 @@ HRESULT NeonWindow::CreateDeviceResources() {
 		if (SUCCEEDED(hr)) {
 			////
 			hr = m_pHwndRenderTarget->CreateSolidColorBrush(
-				D2D1::ColorF((UINT32)ns.bkcolor),
+				D2D1::ColorF((UINT32)ns.panelcolor),
 				&m_pBackgroundBrush
 			);
 		}
@@ -143,7 +143,7 @@ HRESULT NeonWindow::OnRender() {
 			auto size = m_pHwndRenderTarget->GetSize();
 			m_pHwndRenderTarget->BeginDraw();
 			m_pHwndRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
-			m_pHwndRenderTarget->Clear(D2D1::ColorF(ns.fgcolor));
+			m_pHwndRenderTarget->Clear(D2D1::ColorF(ns.revealcolor));
 			m_pHwndRenderTarget->FillRectangle(
 				D2D1::RectF(0,250,800.0,480.0),
 				m_pBackgroundBrush);
@@ -203,16 +203,16 @@ bool NeonWindow::UpdateTheme()
 	if (hBrush) {
 		DeleteObject(hBrush);
 	}
-	hBrush = CreateSolidBrush(calcLuminance(ns.bkcolor));
+	hBrush = CreateSolidBrush(calcLuminance(ns.panelcolor));
 	if (hBrushContent) {
 		DeleteObject(hBrushContent);
 	}
 	SafeRelease(&m_pBackgroundBrush);
 	auto hr = m_pHwndRenderTarget->CreateSolidColorBrush(
-		D2D1::ColorF((UINT32)ns.bkcolor),
+		D2D1::ColorF((UINT32)ns.panelcolor),
 		&m_pBackgroundBrush
 	);
-	hBrushContent=CreateSolidBrush(calcLuminance(ns.fgcolor));
+	hBrushContent=CreateSolidBrush(calcLuminance(ns.revealcolor));
 	::InvalidateRect(hCheck, nullptr, TRUE);
 	InvalidateRect(nullptr, TRUE);
 	return true;
@@ -404,8 +404,8 @@ LRESULT NeonWindow::OnCreate(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL & bHa
 		HMENU(IDC_FILEOPEN_BUTTON));
 
 	InitializeComboHash(hCombo);
-	hBrush = CreateSolidBrush(calcLuminance(ns.bkcolor));
-	hBrushContent = CreateSolidBrush(calcLuminance(ns.fgcolor));
+	hBrush = CreateSolidBrush(calcLuminance(ns.panelcolor));
+	hBrushContent = CreateSolidBrush(calcLuminance(ns.revealcolor));
 	HMENU hSystemMenu = ::GetSystemMenu(m_hWnd, FALSE);
 	InsertMenuW(hSystemMenu, SC_CLOSE, MF_ENABLED, IDM_CHANGE_THEME, L"Theme");
 	InsertMenuW(hSystemMenu, SC_CLOSE, MF_ENABLED, IDM_KISMET_INFO, L"About Kismet\tAlt+F1");
@@ -523,13 +523,13 @@ static COLORREF CustColors[] =
 
 LRESULT NeonWindow::OnTheme(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL & bHandled)
 {
-	auto color = calcLuminance(ns.bkcolor);
+	auto color = calcLuminance(ns.panelcolor);
 	CHOOSECOLOR co;
 	ZeroMemory(&co, sizeof(co));
 	co.lStructSize = sizeof(CHOOSECOLOR);
 	co.hwndOwner = m_hWnd;
 	co.lpCustColors = (LPDWORD)CustColors;
-	co.rgbResult = calcLuminance(ns.bkcolor);
+	co.rgbResult = calcLuminance(ns.panelcolor);
 	co.lCustData = 0;
 	co.lpTemplateName = nullptr;
 	co.lpfnHook = nullptr;
@@ -539,7 +539,7 @@ LRESULT NeonWindow::OnTheme(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL & bHa
 		auto r = GetRValue(co.rgbResult);
 		auto g = GetGValue(co.rgbResult);
 		auto b = GetBValue(co.rgbResult);
-		ns.bkcolor = (r << 16) + (g << 8) + b;
+		ns.panelcolor = (r << 16) + (g << 8) + b;
 		UpdateTheme();
 	}
 	return S_OK;

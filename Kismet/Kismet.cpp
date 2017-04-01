@@ -64,10 +64,10 @@ bool ApplyWindowSettings(NeonSettings &ns) {
 	if (!PathFileExistsW(file.data()))
 		return false;
 	wchar_t colorbuf[20];
-	swprintf_s(colorbuf, L"#%06X", ns.bkcolor);
-	WritePrivateProfileStringW(L"Window", L"Background", colorbuf, file.data());
-	swprintf_s(colorbuf, L"#%06X", ns.fgcolor);
-	WritePrivateProfileStringW(L"Window", L"Foreground", colorbuf, file.data());
+	swprintf_s(colorbuf, L"#%06X", ns.panelcolor);
+	WritePrivateProfileStringW(L"Window", L"PanelColor", colorbuf, file.data());
+	swprintf_s(colorbuf, L"#%06X", ns.revealcolor);
+	WritePrivateProfileStringW(L"Window", L"RevealColor", colorbuf, file.data());
 	return true;
 }
 
