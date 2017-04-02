@@ -21,7 +21,7 @@ bool SHA256Sum(const FilesumEm &fse) {
 		GENERIC_READ,
 		FILE_SHARE_READ,
 		NULL,
-		OPEN_ALWAYS,
+		OPEN_EXISTING,
 		FILE_ATTRIBUTE_NORMAL,
 		nullptr);
 	if (hFile == INVALID_HANDLE_VALUE) {
@@ -83,7 +83,7 @@ bool SHA512Sum(const FilesumEm &fse) {
 		GENERIC_READ,
 		FILE_SHARE_READ,
 		NULL,
-		OPEN_ALWAYS,
+		OPEN_EXISTING,
 		FILE_ATTRIBUTE_NORMAL,
 		nullptr);
 	if (hFile == INVALID_HANDLE_VALUE) {

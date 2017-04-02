@@ -18,10 +18,11 @@
 struct NeonSettings {
 	/// color
 	std::uint32_t panelcolor{ 0xfec418 };
-	std::uint32_t revealcolor{ 0xffffff };
+	std::uint32_t contentcolor{ 0xffffff };
 	std::wstring title;
 };
 
+bool ApplyWindowSettings(NeonSettings &ns);
 
 bool KismetDiscoverWindow(
 	HWND hParent,

@@ -143,7 +143,7 @@ HRESULT NeonWindow::OnRender() {
 			auto size = m_pHwndRenderTarget->GetSize();
 			m_pHwndRenderTarget->BeginDraw();
 			m_pHwndRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
-			m_pHwndRenderTarget->Clear(D2D1::ColorF(ns.revealcolor));
+			m_pHwndRenderTarget->Clear(D2D1::ColorF(ns.contentcolor));
 			m_pHwndRenderTarget->FillRectangle(
 				D2D1::RectF(0,250,800.0,480.0),
 				m_pBackgroundBrush);
@@ -212,7 +212,7 @@ bool NeonWindow::UpdateTheme()
 		D2D1::ColorF((UINT32)ns.panelcolor),
 		&m_pBackgroundBrush
 	);
-	hBrushContent=CreateSolidBrush(calcLuminance(ns.revealcolor));
+	hBrushContent=CreateSolidBrush(calcLuminance(ns.contentcolor));
 	::InvalidateRect(hCheck, nullptr, TRUE);
 	InvalidateRect(nullptr, TRUE);
 	return true;
@@ -405,7 +405,7 @@ LRESULT NeonWindow::OnCreate(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL & bHa
 
 	InitializeComboHash(hCombo);
 	hBrush = CreateSolidBrush(calcLuminance(ns.panelcolor));
-	hBrushContent = CreateSolidBrush(calcLuminance(ns.revealcolor));
+	hBrushContent = CreateSolidBrush(calcLuminance(ns.contentcolor));
 	HMENU hSystemMenu = ::GetSystemMenu(m_hWnd, FALSE);
 	InsertMenuW(hSystemMenu, SC_CLOSE, MF_ENABLED, IDM_CHANGE_THEME, L"Theme");
 	InsertMenuW(hSystemMenu, SC_CLOSE, MF_ENABLED, IDM_KISMET_INFO, L"About Kismet\tAlt+F1");
@@ -541,6 +541,7 @@ LRESULT NeonWindow::OnTheme(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL & bHa
 		auto b = GetBValue(co.rgbResult);
 		ns.panelcolor = (r << 16) + (g << 8) + b;
 		UpdateTheme();
+		ApplyWindowSettings(ns);
 	}
 	return S_OK;
 }

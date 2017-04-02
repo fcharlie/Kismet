@@ -60,24 +60,48 @@ std::wstring PathCombineWithExe(const std::wstring &file) {
 }
 
 bool ApplyWindowSettings(NeonSettings &ns) {
-	auto file = PathCombineWithExe(L"kismet.ini");
-	if (!PathFileExistsW(file.data()))
+	auto file = PathCombineWithExe(L"Kismet.exe.ini");
+	if (file.empty())
 		return false;
+	if (!PathFileExistsW(file.data())) {
+		auto hFile = CreateFileW(file.data(), 
+			GENERIC_WRITE,
+			FILE_SHARE_READ,
+			nullptr, 
+			CREATE_NEW, 
+			FILE_ATTRIBUTE_NORMAL,
+			nullptr);
+		if (hFile == INVALID_HANDLE_VALUE)
+			return false;
+		CloseHandle(hFile);
+	}
 	wchar_t colorbuf[20];
 	swprintf_s(colorbuf, L"#%06X", ns.panelcolor);
-	WritePrivateProfileStringW(L"Window", L"PanelColor", colorbuf, file.data());
-	swprintf_s(colorbuf, L"#%06X", ns.revealcolor);
-	WritePrivateProfileStringW(L"Window", L"RevealColor", colorbuf, file.data());
+	WritePrivateProfileStringW(L"Color", L"Panel", colorbuf, file.data());
+	swprintf_s(colorbuf, L"#%06X", ns.contentcolor);
+	WritePrivateProfileStringW(L"Color", L"Content", colorbuf, file.data());
 	return true;
 }
 
 bool UpdateWindowSettings(NeonSettings &ns) {
-	auto file = PathCombineWithExe(L"kismet.ini");
+	auto file = PathCombineWithExe(L"Kismet.exe.ini");
 	if (file.empty())
 		return false;
 	if (!PathFileExistsW(file.data()))
 		return false;
-	wchar_t colorbuf[20];
+	wchar_t buf[MAX_PATH];
+	auto N = GetPrivateProfileStringW(L"Window", L"Title", nullptr, buf, MAX_PATH, file.data());
+	if (N>1) {
+		ns.title.assign(buf,N);
+	}
+	N = GetPrivateProfileStringW(L"Color", L"Panel", nullptr, buf, MAX_PATH, file.data());
+	if (N>1) {
+		InitializeColorValue(buf,ns.panelcolor);
+	}
+	N = GetPrivateProfileStringW(L"Color", L"Content", nullptr, buf, MAX_PATH, file.data());
+	if (N>1) {
+		InitializeColorValue(buf, ns.contentcolor);
+	}
 	///GetPrivateProfileStringW()
 	return true;
 }
