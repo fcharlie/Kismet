@@ -97,8 +97,5 @@
     <None Include="Kismet.exe.ini">
       <Filter>资源文件</Filter>
     </None>
-    <None Include="App.config">
-      <Filter>资源文件</Filter>
-    </None>
   </ItemGroup>
 </Project>

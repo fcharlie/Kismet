@@ -184,7 +184,6 @@
     <Manifest Include="Kismet.manifest" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
     <None Include="Kismet.exe.ini" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
