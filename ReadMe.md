@@ -8,18 +8,15 @@
 ## SHA1 Collision Detection
 ![image](./docs/images/coll.png)
 
-SHA1 Collision
-
-![sha1 collision](./docs/images/sha1coll.png)
-
 
 ## Complete
 
 ![complete](./docs/images/complete.png)
 
 
-## Theme
+## Theme 
 
-![Theme](./docs/images/theme.png)
+Your can select system menu, click Theme, change your Panel Color, or modify Kismet.exe.ini,
+change Content color, and set your title
 
 WORKING IN PROGRESS
