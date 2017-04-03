@@ -636,7 +636,6 @@ LRESULT NeonWindow::Filesum(const std::wstring & file)
 		if (!result) {
 			showerror = true;
 		}
-		InvalidateRect(nullptr);
 		locked = false;
 	});
 	return S_OK;
