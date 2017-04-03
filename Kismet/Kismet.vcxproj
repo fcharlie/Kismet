@@ -168,7 +168,6 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="Kismet.ico" />
-    <Image Include="small.ico" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Hashsum\Hashsum.vcxproj">

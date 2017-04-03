@@ -80,6 +80,10 @@ bool ApplyWindowSettings(NeonSettings &ns) {
 	WritePrivateProfileStringW(L"Color", L"Panel", colorbuf, file.data());
 	swprintf_s(colorbuf, L"#%06X", ns.contentcolor);
 	WritePrivateProfileStringW(L"Color", L"Content", colorbuf, file.data());
+	swprintf_s(colorbuf, L"#%06X", ns.textcolor);
+	WritePrivateProfileStringW(L"Color", L"Text", colorbuf, file.data());
+	swprintf_s(colorbuf, L"#%06X", ns.labelcolor);
+	WritePrivateProfileStringW(L"Color", L"Label", colorbuf, file.data());
 	return true;
 }
 
@@ -101,6 +105,14 @@ bool UpdateWindowSettings(NeonSettings &ns) {
 	N = GetPrivateProfileStringW(L"Color", L"Content", nullptr, buf, MAX_PATH, file.data());
 	if (N>1) {
 		InitializeColorValue(buf, ns.contentcolor);
+	}
+	N = GetPrivateProfileStringW(L"Color", L"Text", nullptr, buf, MAX_PATH, file.data());
+	if (N>1) {
+		InitializeColorValue(buf, ns.textcolor);
+	}
+	N = GetPrivateProfileStringW(L"Color", L"Label", nullptr, buf, MAX_PATH, file.data());
+	if (N>1) {
+		InitializeColorValue(buf, ns.labelcolor);
 	}
 	///GetPrivateProfileStringW()
 	return true;

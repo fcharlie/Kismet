@@ -20,6 +20,8 @@ struct NeonSettings {
 	/// color
 	std::uint32_t panelcolor{ 0x00BFFF };
 	std::uint32_t contentcolor{ 0xffffff };
+	std::uint32_t textcolor{ 0x000000 };
+	std::uint32_t labelcolor{ 0x000000 };
 	std::wstring title;
 };
 
@@ -78,18 +80,21 @@ private:
 	/////////// self control handle
 	LRESULT Filesum(const std::wstring &file);
 	void UpdateTitle(const std::wstring &title_);
+	bool CopyToClipboard(const std::wstring &text);
 	bool UpdateTheme();
 	HWND hCombo{ nullptr };
-	HWND hContent{ nullptr };
 	HWND hOpenButton{ nullptr };
 	HWND hClearButton{ nullptr };
 	HWND hCheck{ nullptr };
 	HBRUSH hBrush{ nullptr };
-	HBRUSH hBrushContent{ nullptr };
 	NeonSettings ns;
 	std::wstring content;
+	std::wstring hash;
 	std::atomic_uint32_t progress{ 0 };
 	std::atomic_bool locked{ false };
+	std::uint32_t height;
+	std::uint32_t width;
+	std::uint32_t areaheigh;
 	bool showerror{ false };
 
 public:
@@ -102,15 +107,18 @@ public:
 	DECLARE_WND_CLASS(NEONWINDOWNAME)
 	BEGIN_MSG_MAP(MetroWindow)
 		MESSAGE_HANDLER(WM_CREATE, OnCreate)
-		MESSAGE_HANDLER(WM_CTLCOLORSTATIC,OnColorStatic)
+		MESSAGE_HANDLER(WM_CTLCOLORSTATIC, OnColorStatic)
+		MESSAGE_HANDLER(WM_KEYDOWN, OnKeydown);
 		MESSAGE_HANDLER(WM_SIZE, OnSize)
 		MESSAGE_HANDLER(WM_PAINT, OnPaint)
 		MESSAGE_HANDLER(WM_DISPLAYCHANGE, OnDisplayChange)
 		MESSAGE_HANDLER(WM_DROPFILES, OnDropfiles)
 		MESSAGE_HANDLER(WM_CLOSE, OnClose)
 		MESSAGE_HANDLER(WM_DESTROY, OnDestroy)
+		MESSAGE_HANDLER(WM_RBUTTONUP, OnRButtonUp)
 		COMMAND_ID_HANDLER(IDC_CLEAR_BUTTON, OnContentClear)
 		COMMAND_ID_HANDLER(IDC_FILEOPEN_BUTTON, OnOpenFile)
+		COMMAND_ID_HANDLER(IDM_CONTEXT_COPY,OnCopy)
 		SYSCOMMAND_ID_HANDLER(IDM_CHANGE_THEME,OnTheme)
 		SYSCOMMAND_ID_HANDLER(IDM_KISMET_INFO,OnAbout)
 	END_MSG_MAP()
@@ -120,13 +128,16 @@ public:
 	LRESULT OnSize(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandle);
 	LRESULT OnPaint(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandle);
 	LRESULT OnDisplayChange(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL & bHandled);
+	LRESULT OnKeydown(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL & bHandled);
 	LRESULT OnDropfiles(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL & bHandled);
 	LRESULT OnColorStatic(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandle);
 	LRESULT OnColorButton(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandle);
+	LRESULT OnRButtonUp(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	LRESULT OnContentClear(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnOpenFile(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnTheme(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnAbout(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnCopy(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	bool FilesumInvoke(std::int32_t state, std::uint32_t progress_, std::wstring data);
 };
 

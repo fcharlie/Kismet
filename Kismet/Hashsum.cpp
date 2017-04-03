@@ -128,7 +128,7 @@ public:
 		rhash_sha512_update(&ctx, buf, len);
 	}
 	void Final(bool ucase, std::wstring &hash) {
-		unsigned char buf[sha256_hash_size];
+		unsigned char buf[sha512_hash_size];
 		rhash_sha512_final(&ctx, buf);
 		if (ucase)
 			BinaryToHexUCase(buf, width / 8, hash);
@@ -166,7 +166,7 @@ public:
 		rhash_sha3_update(&ctx, buf, len);
 	}
 	void Final(bool ucase, std::wstring &hash) {
-		unsigned char buf[sha256_hash_size];
+		unsigned char buf[sha3_512_hash_size];
 		rhash_sha3_final(&ctx, buf);
 		if (ucase)
 			BinaryToHexUCase(buf, width / 8, hash);

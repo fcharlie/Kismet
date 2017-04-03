@@ -63,12 +63,14 @@ LRESULT NeonWindow::InitializeWindow()
 	HRESULT  hr = E_FAIL;
 	RECT layout = { 100, 100,800, 470 };
 	if (ns.title.empty()) {
-		ns.title.assign(L"Kismet Neon");
+		ns.title.assign(L"Kismet Immersive");
 	}
+	width = 700;
+	height = 370;
+	areaheigh = 250;
 	Create(nullptr, layout, ns.title.data(),
 		WS_NORESIZEWINDOW,
 		WS_EX_APPWINDOW | WS_EX_WINDOWEDGE);
-	//Securehashsum::Instance().InitializeSecureTask();
 	return S_OK;
 }
 
@@ -87,7 +89,7 @@ HRESULT NeonWindow::CreateDeviceIndependentResources() {
 				DWRITE_FONT_WEIGHT_NORMAL,
 				DWRITE_FONT_STYLE_NORMAL,
 				DWRITE_FONT_STRETCH_NORMAL,
-				18.0f,
+				16.0f,
 				L"zh-CN",
 				&m_pWriteTextFormat);
 		}
@@ -125,7 +127,7 @@ HRESULT NeonWindow::CreateDeviceResources() {
 		}
 		if (SUCCEEDED(hr)) {
 			hr = m_pHwndRenderTarget->CreateSolidColorBrush(
-				D2D1::ColorF(D2D1::ColorF::Black),
+				D2D1::ColorF(ns.labelcolor),
 				&m_pNormalTextBrush
 			);
 		}
@@ -147,14 +149,27 @@ HRESULT NeonWindow::OnRender() {
 			m_pHwndRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
 			m_pHwndRenderTarget->Clear(D2D1::ColorF(ns.contentcolor));
 			m_pHwndRenderTarget->FillRectangle(
-				D2D1::RectF(0,250,800.0,480.0),
+				D2D1::RectF(0,areaheigh,size.width,size.height),
 				m_pBackgroundBrush);
+			wchar_t uppercase[] = L"Uppercase";
+			m_pHwndRenderTarget->DrawTextW(uppercase, 9,
+				m_pWriteTextFormat,
+				D2D1::RectF(40, areaheigh+28.0f,200.0f, areaheigh+50.0f), m_pNormalTextBrush,
+				D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT,
+				DWRITE_MEASURING_MODE_NATURAL);
+			if (content.size()) {
+				m_pHwndRenderTarget->DrawTextW(content.data(), content.size(),
+					m_pWriteTextFormat,
+					D2D1::RectF(20, 0.0f, size.width-20, size.height - 100.0f), m_pNormalTextBrush,
+					D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT,
+					DWRITE_MEASURING_MODE_NATURAL);
+			}
 			//// write progress 100 %
 			if (progress == 100) {
 				wchar_t text[] = L"\xD83D\xDCAF";
 				m_pHwndRenderTarget->DrawTextW(
 					text, 2, m_pWriteTextFormat,
-					D2D1::RectF(160.0f, 278.0f, 250.0f, 305.0f),
+					D2D1::RectF(160.0f, areaheigh + 28.0f, 250.0f, areaheigh + 50.5f),
 					m_pNormalTextBrush, D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT,
 					DWRITE_MEASURING_MODE_NATURAL);
 			}
@@ -162,7 +177,7 @@ HRESULT NeonWindow::OnRender() {
 				auto progressText = std::to_wstring(progress) + L"%";
 				m_pHwndRenderTarget->DrawTextW(
 					progressText.c_str(), progressText.size(), m_pWriteTextFormat,
-					D2D1::RectF(160.0f, 278.0f, 250.0f, 305.0f),
+					D2D1::RectF(160.0f, areaheigh + 28.0f, 250.0f, areaheigh + 50.5f),
 					m_pNormalTextBrush, D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT,
 					DWRITE_MEASURING_MODE_NATURAL);
 			}
@@ -170,7 +185,7 @@ HRESULT NeonWindow::OnRender() {
 				wchar_t text[] = L"\x3DD8\x14DE";
 				m_pHwndRenderTarget->DrawTextW(
 					text, 2, m_pWriteTextFormat,
-					D2D1::RectF(160.0f, 278.0f, 250.0f, 305.0f),
+					D2D1::RectF(160.0f, areaheigh + 28.0f, 250.0f, areaheigh + 50.5f),
 					m_pNormalTextBrush, D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT,
 					DWRITE_MEASURING_MODE_NATURAL);
 			}
@@ -222,15 +237,11 @@ bool NeonWindow::UpdateTheme()
 		DeleteObject(hBrush);
 	}
 	hBrush = CreateSolidBrush(calcLuminance(ns.panelcolor));
-	if (hBrushContent) {
-		DeleteObject(hBrushContent);
-	}
 	SafeRelease(&m_pBackgroundBrush);
 	auto hr = m_pHwndRenderTarget->CreateSolidColorBrush(
 		D2D1::ColorF((UINT32)ns.panelcolor),
 		&m_pBackgroundBrush
 	);
-	hBrushContent=CreateSolidBrush(calcLuminance(ns.contentcolor));
 	::InvalidateRect(hCheck, nullptr, TRUE);
 	InvalidateRect(nullptr, TRUE);
 	return true;
@@ -245,11 +256,10 @@ bool NeonWindow::FilesumInvoke(std::int32_t state, std::uint32_t pg, std::wstrin
 		return false;
 	case kFilesumMessage:
 		content.assign(std::move(data));
-		::SetWindowTextW(hContent, content.data());
 		break;
 	case kFilesumCompleted:
 		content.append(data);
-		::SetWindowTextW(hContent, content.data());
+		hash.assign(data);
 		break;
 	case kFilesumProgress:
 		progress = pg;
@@ -366,7 +376,7 @@ LRESULT NeonWindow::OnCreate(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL & bHa
 		std::terminate();
 		return S_FALSE;
 	}
-	HICON hIcon = LoadIconW(GetModuleHandleW(nullptr), MAKEINTRESOURCEW(107));
+	HICON hIcon = LoadIconW(GetModuleHandleW(nullptr), MAKEINTRESOURCEW(IDI_KISMET));
 	SetIcon(hIcon, TRUE);
 	ChangeWindowMessageFilter(WM_DROPFILES, MSGFLT_ADD);
 	ChangeWindowMessageFilter(WM_COPYDATA, MSGFLT_ADD);
@@ -402,38 +412,33 @@ LRESULT NeonWindow::OnCreate(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL & bHa
 	};
 	RECT rect;
 	GetWindowRect(&rect);
-	hContent = LambdaCreateWindow(WC_EDITW, L"",
-		KWS_EDIT |ES_MULTILINE| ES_READONLY,
-		20, 0, rect.right-rect.left-60, 250,
-		HMENU(IDC_CONTENT_EDIT));
 
 	hCheck = LambdaCreateWindow(WC_BUTTONW, 
-		L"Uppercase", 
+		L"", 
 		KWS_CHECKBOX, 
-		20, 275, 90, 27, nullptr);
+		20, areaheigh+30, 20, 20, nullptr);
 
 	hCombo = LambdaCreateWindow(WC_COMBOBOXW, L"",
 		KWS_COMBOBOX,
-		rect.right - rect.left - 420, 275, 120, 27, nullptr);
+		width- 420, areaheigh+25, 120, 27, nullptr);
 
 	hOpenButton = LambdaCreateWindow(WC_BUTTONW,
 		L"Clear",
 		KWS_BUTTON,
-		rect.right - rect.left - 290, 275, 120, 27,
+		width - 290, areaheigh+25, 120, 27,
 		HMENU(IDC_CLEAR_BUTTON));
 
 	hOpenButton = LambdaCreateWindow(WC_BUTTONW, 
 		L"Open", 
 		KWS_BUTTON,
-		rect.right-rect.left-160, 275, 120, 27, 
+		width-160, areaheigh+25, 120, 27, 
 		HMENU(IDC_FILEOPEN_BUTTON));
 
 	InitializeComboHash(hCombo);
 	hBrush = CreateSolidBrush(calcLuminance(ns.panelcolor));
-	hBrushContent = CreateSolidBrush(calcLuminance(ns.contentcolor));
 	HMENU hSystemMenu = ::GetSystemMenu(m_hWnd, FALSE);
-	InsertMenuW(hSystemMenu, SC_CLOSE, MF_ENABLED, IDM_CHANGE_THEME, L"Theme");
-	InsertMenuW(hSystemMenu, SC_CLOSE, MF_ENABLED, IDM_KISMET_INFO, L"About Kismet\tAlt+F1");
+	InsertMenuW(hSystemMenu, SC_CLOSE, MF_ENABLED, IDM_CHANGE_THEME, L"Change Panel Color");
+	InsertMenuW(hSystemMenu, SC_CLOSE, MF_ENABLED, IDM_KISMET_INFO, L"About Kismet Immersive\tAlt+F1");
 	return S_OK;
 }
 
@@ -441,9 +446,6 @@ LRESULT NeonWindow::OnDestroy(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL & bH
 {
 	if (hBrush) {
 		DeleteObject(hBrush);
-	}
-	if (hBrushContent) {
-		DeleteObject(hBrushContent);
 	}
 	PostQuitMessage(0);
 	return S_OK;
@@ -476,20 +478,37 @@ LRESULT NeonWindow::OnDisplayChange(UINT nMsg, WPARAM wParam, LPARAM lParam, BOO
 	return S_OK;
 }
 
+bool IsKeyPressed(UINT nVirtKey)
+{
+	return GetKeyState(nVirtKey) < 0 ? true : false;
+}
+
+LRESULT NeonWindow::OnKeydown(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL & bHandled)
+{
+	bool fCtrlDown = IsKeyPressed(VK_CONTROL);
+	switch (wParam) {
+	case 'c':
+	case 'C':
+		CopyToClipboard(hash);
+		MessageBeep(MB_OK);
+		return S_OK;
+	default:
+		return 0;
+	}
+
+	return S_OK;
+}
+
 LRESULT NeonWindow::OnColorStatic(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL & bHandle)
 {
 	HDC hdc = (HDC)wParam;
 	auto hControl = reinterpret_cast<HWND>(lParam);
 	if (hControl == hCheck)
 	{
-		return (LRESULT)((HBRUSH)hBrush);
-	}
-	else if (hControl ==hContent ) {
-		// if edit control is in dialog procedure change LRESULT to INT_PTR
 		SetBkMode(hdc, TRANSPARENT);
-		SetBkColor(hdc,RGB(255, 255, 255));
-		SetTextColor(hdc, RGB(0, 0, 0));
-		return (LRESULT)((HRESULT)hBrushContent);
+		//SetBkColor(hdc, RGB(255, 255, 255));
+		SetTextColor(hdc, calcLuminance(ns.labelcolor));
+		return (LRESULT)((HBRUSH)hBrush);
 	}
 	return ::DefWindowProc(m_hWnd, nMsg, wParam, lParam);
 }
@@ -502,11 +521,40 @@ LRESULT NeonWindow::OnColorButton(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL 
 	return (LRESULT)((HRESULT)hBrush);
 }
 
+LRESULT NeonWindow::OnRButtonUp(UINT, WPARAM wParam, LPARAM lParam, BOOL & bHandled)
+{
+	POINT pt;
+	GetCursorPos(&pt);
+	auto ptc = pt;
+	ScreenToClient(&pt);
+	if (pt.y >= (LONG)areaheigh) {
+		//// NOT Area
+		return S_OK;
+	}
+	HMENU hMenu = ::LoadMenuW(GetModuleHandle(nullptr), MAKEINTRESOURCEW(IDM_KISMET_CONTEXT));
+	HMENU hPopu = GetSubMenu(hMenu, 0);
+	if (content.empty()) {
+		EnableMenuItem(hPopu, IDM_CONTEXT_COPYALL, MF_DISABLED);
+	}
+	else {
+		EnableMenuItem(hPopu, IDM_CONTEXT_COPYALL, MF_ENABLED);
+	}
+	if (hash.empty()) {
+		EnableMenuItem(hPopu, IDM_CONTEXT_COPY, MF_DISABLED);
+	}
+	else {
+		EnableMenuItem(hPopu, IDM_CONTEXT_COPY, MF_ENABLED);
+	}
+	::TrackPopupMenuEx(hPopu, TPM_RIGHTBUTTON, ptc.x, ptc.y, m_hWnd, nullptr);
+	::DestroyMenu(hPopu);
+	return S_OK;
+}
+
 LRESULT NeonWindow::OnContentClear(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL & bHandled)
 {
 	if (!locked) {
 		content.clear();
-		::SetWindowTextW(hContent, content.data());
+		hash.clear();
 		progress = 0;
 		UpdateTitle(L"");
 		InvalidateRect(nullptr, false);
@@ -517,13 +565,11 @@ LRESULT NeonWindow::OnContentClear(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOO
 LRESULT NeonWindow::Filesum(const std::wstring & file)
 {
 	if (locked) {
-		/// is locked
 		return S_FALSE;
 	}
 	FilesumAlgw aw;
 	bool ucase = (Button_GetCheck(hCheck) == BST_CHECKED);
 	if (!HashsumAlgmCheck(ComboBox_GetCurSel(hCombo), aw)) {
-		
 		return false;
 	}
 	//// create task
@@ -549,8 +595,20 @@ LRESULT NeonWindow::Filesum(const std::wstring & file)
 		LARGE_INTEGER li;
 		GetFileSizeEx(hFile, &li);
 		auto Ptr = reinterpret_cast<wchar_t *>(buffer);
+		std::wstring filename;
+		if (file.size() > 64) {
+			filename.assign(PathFindFileNameW(file.data()));
+			if (filename.size() > 64)
+			{
+				filename.resize(64);
+				filename.append(L"...");
+			}
+		}
+		else {
+			filename = file;
+		}
 		_snwprintf_s(Ptr, sizeof(buffer) / 2, sizeof(buffer) / 2,
-			L"File:\t%s\r\nSize:\t%lld\r\n%s:\t", file.data(), li.QuadPart,aw.name.data());
+			L"File:\t%s\r\nSize:\t%lld\r\n%s:\t", filename.data(), li.QuadPart,aw.name.data());
 		FilesumInvoke(kFilesumMessage, 0, Ptr);
 		DWORD dwRead;
 		int64_t cmsize = 0;
@@ -578,10 +636,22 @@ LRESULT NeonWindow::Filesum(const std::wstring & file)
 		if (!result) {
 			showerror = true;
 		}
+		InvalidateRect(nullptr);
 		locked = false;
 	});
 	return S_OK;
 }
+
+LRESULT NeonWindow::OnDropfiles(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL & bHandled)
+{
+	HDROP hDrop = (HDROP)wParam;
+	WCHAR file[32267];
+	UINT nfilecounts = DragQueryFileW(hDrop, 0, file, sizeof(file));
+	DragFinish(hDrop);
+	if (nfilecounts == 0)return S_OK;
+	return Filesum(file);
+}
+
 
 
 LRESULT NeonWindow::OnOpenFile(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL & bHandled)
@@ -638,12 +708,31 @@ LRESULT NeonWindow::OnAbout(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL & bHa
 	return S_OK;
 }
 
-LRESULT NeonWindow::OnDropfiles(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL & bHandled)
-{
-	HDROP hDrop = (HDROP)wParam;
-	WCHAR file[32267];
-	UINT nfilecounts = DragQueryFileW(hDrop, 0, file, sizeof(file));
-	DragFinish(hDrop);
-	if (nfilecounts ==0)return S_OK;
-	return Filesum(file);
+bool NeonWindow::CopyToClipboard(const std::wstring &text) {
+	if (text.empty())
+		return false;
+	if (!OpenClipboard()) {
+		return false;
+	}
+	if (!EmptyClipboard()) {
+		CloseClipboard();
+		return false;
+	}
+	HGLOBAL hgl = GlobalAlloc(GMEM_MOVEABLE, (text.size() + 1) * sizeof(wchar_t));
+	if (hgl==nullptr) {
+		CloseClipboard();
+		return false;
+	}
+	LPWSTR ptr = (LPWSTR)GlobalLock(hgl);
+	memcpy(ptr, text.data(), (text.size() + 1) * sizeof(wchar_t));
+	SetClipboardData(CF_UNICODETEXT, hgl);
+	CloseClipboard();
+	return true;
 }
+
+LRESULT NeonWindow::OnCopy(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL & bHandled)
+{
+	CopyToClipboard(hash);
+	return S_OK;
+}
+
