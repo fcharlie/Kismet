@@ -19,7 +19,7 @@
 Your can select system menu, click Theme, change your Panel Color, or modify Kismet.exe.ini,
 change Content color, and set your title
 
-Your can fill include content and panel use one color
+You can use a color that fills the entire window
 
 ![onecolor](./docs/images/onecolor.png)
 
