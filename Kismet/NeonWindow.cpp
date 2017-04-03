@@ -326,12 +326,17 @@ inline bool ComboHashValue(int i, FilesumEm &fse) {
 }
 
 
-#define WINDOWEXSTYLE WS_EX_LEFT | WS_EX_LTRREADING | WS_EX_RIGHTSCROLLBAR | WS_EX_NOPARENTNOTIFY
-#define EDITBOXSTYLE  WS_CHILDWINDOW | WS_CLIPSIBLINGS | WS_VISIBLE |WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL
-#define PUSHBUTTONSTYLE BS_PUSHBUTTON |BS_FLAT|BS_TEXT | WS_CHILD | WS_OVERLAPPED | WS_VISIBLE
-//|BS_OWNERDRAW
-#define CHECKBOXSTYLE BS_PUSHBUTTON | BS_TEXT | BS_DEFPUSHBUTTON | BS_CHECKBOX | BS_AUTOCHECKBOX | WS_CHILD | WS_OVERLAPPED | WS_VISIBLE
-#define COMBOBOXSTYLE WS_CHILDWINDOW | WS_CLIPSIBLINGS | WS_VISIBLE | WS_TABSTOP | CBS_DROPDOWNLIST  | CBS_HASSTRINGS
+//// Window  style-ex
+#define KWS_WINDOWEX WS_EX_LEFT | WS_EX_LTRREADING | WS_EX_RIGHTSCROLLBAR | WS_EX_NOPARENTNOTIFY
+//// Edit style
+#define KWS_EDIT  WS_CHILDWINDOW | WS_CLIPSIBLINGS | WS_VISIBLE |WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL
+/// push button style
+#define KWS_BUTTON BS_PUSHBUTTON |BS_FLAT|BS_TEXT | WS_CHILD | WS_OVERLAPPED | WS_VISIBLE
+/// checkbox style
+#define KWS_CHECKBOX BS_FLAT|BS_TEXT  | BS_CHECKBOX | BS_AUTOCHECKBOX | WS_CHILD | WS_OVERLAPPED | WS_VISIBLE
+/// combobox style
+#define KWS_COMBOBOX WS_CHILDWINDOW | WS_CLIPSIBLINGS | WS_VISIBLE | WS_TABSTOP | \
+CBS_DROPDOWNLIST  | CBS_HASSTRINGS 
 
 LRESULT NeonWindow::OnCreate(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL & bHandle)
 {
@@ -359,7 +364,7 @@ LRESULT NeonWindow::OnCreate(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL & bHa
 	hFont = CreateFontIndirectW(&logFont);
 	auto LambdaCreateWindow = [&](LPCWSTR lpClassName, LPCWSTR lpWindowName, DWORD dwStyle,
 		int X, int Y, int nWidth, int nHeight, HMENU hMenu)->HWND {
-		auto hw = CreateWindowExW(WINDOWEXSTYLE, lpClassName, lpWindowName,
+		auto hw = CreateWindowExW(KWS_WINDOWEX, lpClassName, lpWindowName,
 			dwStyle, X, Y, nWidth, nHeight, m_hWnd, hMenu, HINST_THISCOMPONENT, nullptr);
 		if (hw) {
 			::SendMessageW(hw, WM_SETFONT, (WPARAM)hFont, lParam);
@@ -368,7 +373,7 @@ LRESULT NeonWindow::OnCreate(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL & bHa
 	};
 	auto LambdaCreateWindowEdge = [&](LPCWSTR lpClassName, LPCWSTR lpWindowName, DWORD dwStyle,
 		int X, int Y, int nWidth, int nHeight, HMENU hMenu)->HWND {
-		auto hw = CreateWindowExW(WINDOWEXSTYLE | WS_EX_CLIENTEDGE, lpClassName, lpWindowName,
+		auto hw = CreateWindowExW(KWS_WINDOWEX | WS_EX_CLIENTEDGE, lpClassName, lpWindowName,
 			dwStyle, X, Y, nWidth, nHeight, m_hWnd, hMenu, HINST_THISCOMPONENT, nullptr);
 		if (hw) {
 			::SendMessageW(hw, WM_SETFONT, (WPARAM)hFont, lParam);
@@ -378,28 +383,28 @@ LRESULT NeonWindow::OnCreate(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL & bHa
 	RECT rect;
 	GetWindowRect(&rect);
 	hContent = LambdaCreateWindow(WC_EDITW, L"",
-		EDITBOXSTYLE |ES_MULTILINE| ES_READONLY,
+		KWS_EDIT |ES_MULTILINE| ES_READONLY,
 		20, 0, rect.right-rect.left-60, 250,
 		HMENU(IDC_CONTENT_EDIT));
 
 	hCheck = LambdaCreateWindow(WC_BUTTONW, 
 		L"Uppercase", 
-		CHECKBOXSTYLE, 
+		KWS_CHECKBOX, 
 		20, 275, 90, 27, nullptr);
 
 	hCombo = LambdaCreateWindow(WC_COMBOBOXW, L"",
-		COMBOBOXSTYLE,
+		KWS_COMBOBOX,
 		rect.right - rect.left - 420, 275, 120, 27, nullptr);
 
 	hOpenButton = LambdaCreateWindow(WC_BUTTONW,
 		L"Clear",
-		PUSHBUTTONSTYLE,
+		KWS_BUTTON,
 		rect.right - rect.left - 290, 275, 120, 27,
 		HMENU(IDC_CLEAR_BUTTON));
 
 	hOpenButton = LambdaCreateWindow(WC_BUTTONW, 
 		L"Open", 
-		PUSHBUTTONSTYLE,
+		KWS_BUTTON,
 		rect.right-rect.left-160, 275, 120, 27, 
 		HMENU(IDC_FILEOPEN_BUTTON));
 
