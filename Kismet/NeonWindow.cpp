@@ -10,9 +10,11 @@
 #include <Windowsx.h>
 #include <Mmsystem.h>
 #include <commdlg.h>
+#include <ppltasks.h>
 #include "Kismet.h"
 #include "NeonWindow.h"
 #include "MessageWindow.h"
+#include "Hashsum.h"
 
 
 
@@ -66,7 +68,7 @@ LRESULT NeonWindow::InitializeWindow()
 	Create(nullptr, layout, ns.title.data(),
 		WS_NORESIZEWINDOW,
 		WS_EX_APPWINDOW | WS_EX_WINDOWEDGE);
-	Securehashsum::Instance().InitializeSecureTask();
+	//Securehashsum::Instance().InitializeSecureTask();
 	return S_OK;
 }
 
@@ -85,7 +87,7 @@ HRESULT NeonWindow::CreateDeviceIndependentResources() {
 				DWRITE_FONT_WEIGHT_NORMAL,
 				DWRITE_FONT_STYLE_NORMAL,
 				DWRITE_FONT_STRETCH_NORMAL,
-				12.0f * 96.0f / 72.0f,
+				18.0f,
 				L"zh-CN",
 				&m_pWriteTextFormat);
 		}
@@ -148,12 +150,28 @@ HRESULT NeonWindow::OnRender() {
 				D2D1::RectF(0,250,800.0,480.0),
 				m_pBackgroundBrush);
 			//// write progress 100 %
-			if (progress > 0 && progress <= 100) {
-				auto progrssText=std::to_wstring(progress) + L"%";
+			if (progress == 100) {
+				wchar_t text[] = L"\xD83D\xDCAF";
 				m_pHwndRenderTarget->DrawTextW(
-					progrssText.c_str(), progrssText.size(), m_pWriteTextFormat,
-					D2D1::RectF(160.0f, 278.0f,250.0f,305.0f),
-					m_pNormalTextBrush, D2D1_DRAW_TEXT_OPTIONS_NONE,
+					text, 2, m_pWriteTextFormat,
+					D2D1::RectF(160.0f, 278.0f, 250.0f, 305.0f),
+					m_pNormalTextBrush, D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT,
+					DWRITE_MEASURING_MODE_NATURAL);
+			}
+			else if (progress > 0 && progress < 100) {
+				auto progressText = std::to_wstring(progress) + L"%";
+				m_pHwndRenderTarget->DrawTextW(
+					progressText.c_str(), progressText.size(), m_pWriteTextFormat,
+					D2D1::RectF(160.0f, 278.0f, 250.0f, 305.0f),
+					m_pNormalTextBrush, D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT,
+					DWRITE_MEASURING_MODE_NATURAL);
+			}
+			else if (showerror) {
+				wchar_t text[] = L"\x3DD8\x14DE";
+				m_pHwndRenderTarget->DrawTextW(
+					text, 2, m_pWriteTextFormat,
+					D2D1::RectF(160.0f, 278.0f, 250.0f, 305.0f),
+					m_pNormalTextBrush, D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT,
 					DWRITE_MEASURING_MODE_NATURAL);
 			}
 			hr = m_pHwndRenderTarget->EndDraw();
@@ -228,26 +246,17 @@ bool NeonWindow::FilesumInvoke(std::int32_t state, std::uint32_t pg, std::wstrin
 	case kFilesumMessage:
 		content.assign(std::move(data));
 		::SetWindowTextW(hContent, content.data());
-		return true;
-	case kFilesumCompleted:
-		if (Button_GetCheck(hCheck) == BST_CHECKED) {
-			std::transform(data.begin(), data.end(), data.begin(), std::toupper);
-		}
-		content.append(data);
-		::SetWindowTextW(hContent, content.data());
 		break;
-	case kFilesumCollCompleted:
-		if (Button_GetCheck(hCheck) == BST_CHECKED) {
-			std::transform(data.begin(), data.end(), data.begin(), std::toupper);
-		}
-		content.append(data).append(L" *coll*");
+	case kFilesumCompleted:
+		content.append(data);
 		::SetWindowTextW(hContent, content.data());
 		break;
 	case kFilesumProgress:
 		progress = pg;
 		InvalidateRect(nullptr, false);
-		//InvalidateRect(&progressRect, false);
-		return true;
+		break;
+	default:
+		return false;
 	}
 	return true;
 }
@@ -276,48 +285,59 @@ inline bool InitializeComboHash(HWND hWnd) {
 	return true;
 }
 
-inline bool ComboHashValue(int i, FilesumEm &fse) {
+inline bool HashsumAlgmCheck(int i, FilesumAlgw &aw) {
 	switch (i) {
 	case 0:
-		fse.alm = kFilesumMD5;
+		aw.alm = kFilesumMD5;
+		aw.name = L"MD5";
 		break;
 	case 1:
-		fse.alm = kFilesumSHA1;
+		aw.alm = kFilesumSHA1;
+		aw.name = L"SHA1";
 		break;
 	case 2:
-		fse.alm = kFilesumSHA1DC;
+		aw.alm = kFilesumSHA1DC;
+		aw.name = L"S1-DC";
 		break;
 	case 3:
-		fse.alm = kFilesumSHA2;
-		fse.width = 224;
+		aw.alm = kFilesumSHA2;
+		aw.width = 224;
+		aw.name = L"S2-224";
 		break;
 	case 4:
-		fse.alm = kFilesumSHA2;
-		fse.width = 256;
+		aw.alm = kFilesumSHA2;
+		aw.width = 256;
+		aw.name = L"S2-256";
 		break;
 	case 5:
-		fse.alm = kFilesumSHA2;
-		fse.width = 384;
+		aw.alm = kFilesumSHA2;
+		aw.width = 384;
+		aw.name = L"S2-384";
 		break;
 	case 6:
-		fse.alm = kFilesumSHA2;
-		fse.width = 512;
+		aw.alm = kFilesumSHA2;
+		aw.name = L"S2-512";
+		aw.width = 512;
 		break;
 	case 7:
-		fse.alm = kFilesumSHA3;
-		fse.width = 224;
+		aw.alm = kFilesumSHA3;
+		aw.width = 224;
+		aw.name = L"S3-224";
 		break;
 	case 8:
-		fse.alm = kFilesumSHA3;
-		fse.width = 256;
+		aw.alm = kFilesumSHA3;
+		aw.width = 256;
+		aw.name = L"S3-256";
 		break;
 	case 9:
-		fse.alm = kFilesumSHA3;
-		fse.width = 384;
+		aw.alm = kFilesumSHA3;
+		aw.width = 384;
+		aw.name = L"S3-384";
 		break;
 	case 10:
-		fse.alm = kFilesumSHA3;
-		fse.width = 512;
+		aw.alm = kFilesumSHA3;
+		aw.width = 512;
+		aw.name = L"S3-512";
 		break;
 	default:
 		return false;
@@ -484,7 +504,7 @@ LRESULT NeonWindow::OnColorButton(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL 
 
 LRESULT NeonWindow::OnContentClear(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL & bHandled)
 {
-	if (Securehashsum::Instance().IsEmpty()) {
+	if (!locked) {
 		content.clear();
 		::SetWindowTextW(hContent, content.data());
 		progress = 0;
@@ -494,19 +514,75 @@ LRESULT NeonWindow::OnContentClear(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOO
 	return S_OK;
 }
 
-LRESULT NeonWindow::Filesumsave(const std::wstring &file) {
-	auto i = ComboBox_GetCurSel(hCombo);
-	if (!ComboHashValue(i, fse)) {
-		return S_OK;
+LRESULT NeonWindow::Filesum(const std::wstring & file)
+{
+	if (locked) {
+		/// is locked
+		return S_FALSE;
 	}
+	FilesumAlgw aw;
+	bool ucase = (Button_GetCheck(hCheck) == BST_CHECKED);
+	if (!HashsumAlgmCheck(ComboBox_GetCurSel(hCombo), aw)) {
+		
+		return false;
+	}
+	//// create task
 	UpdateTitle(PathFindFileNameW(file.data()));
-	fse.file = file;
-	fse.callback = [this](std::int32_t state, std::uint32_t progress_, std::wstring data) {
-		return this->FilesumInvoke(state, progress_, data);
-	};
-	Securehashsum::Instance().Push(fse);
+	showerror = false;
+	Concurrency::create_task([this, file,aw,ucase]()->bool {
+		std::shared_ptr<Hashsum> sum(CreateHashsum(file, aw.alm, aw.width));
+		if (!sum) {
+			return false;
+		}
+		auto hFile = CreateFileW(file.data(),
+			GENERIC_READ,
+			FILE_SHARE_READ,
+			NULL,
+			OPEN_EXISTING,
+			FILE_ATTRIBUTE_NORMAL,
+			nullptr);
+		if (hFile == INVALID_HANDLE_VALUE) {
+			FilesumInvoke(kFilesumBroken, 0, L"Invalid handle value");
+			return false;
+		}
+		BYTE buffer[65536];
+		LARGE_INTEGER li;
+		GetFileSizeEx(hFile, &li);
+		auto Ptr = reinterpret_cast<wchar_t *>(buffer);
+		_snwprintf_s(Ptr, sizeof(buffer) / 2, sizeof(buffer) / 2,
+			L"File:\t%s\r\nSize:\t%lld\r\n%s:\t", file.data(), li.QuadPart,aw.name.data());
+		FilesumInvoke(kFilesumMessage, 0, Ptr);
+		DWORD dwRead;
+		int64_t cmsize = 0;
+		for (;;) {
+			if (!ReadFile(hFile, buffer, sizeof(buffer), &dwRead, nullptr)) {
+				break;
+			}
+			sum->Update(buffer, dwRead);
+			cmsize += dwRead;
+			auto N = cmsize * 100 / li.QuadPart;
+			if (!FilesumInvoke(kFilesumProgress, (uint32_t)N, L""))
+			{
+				CloseHandle(hFile);
+				return false;
+			}
+			if (dwRead<sizeof(buffer))
+				break;
+		}
+		CloseHandle(hFile);
+		std::wstring hash;
+		sum->Final(ucase, hash);
+		FilesumInvoke(kFilesumCompleted, 100, hash);
+		return true;
+	}).then([this](bool result) {
+		if (!result) {
+			showerror = true;
+		}
+		locked = false;
+	});
 	return S_OK;
 }
+
 
 LRESULT NeonWindow::OnOpenFile(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL & bHandled)
 {
@@ -514,7 +590,7 @@ LRESULT NeonWindow::OnOpenFile(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL & 
 	if (!KismetDiscoverWindow(m_hWnd, filename, L"Open File")) {
 		return S_OK;
 	}
-	return Filesumsave(filename);
+	return Filesum(filename);
 }
 
 static COLORREF CustColors[] =
@@ -569,5 +645,5 @@ LRESULT NeonWindow::OnDropfiles(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL & 
 	UINT nfilecounts = DragQueryFileW(hDrop, 0, file, sizeof(file));
 	DragFinish(hDrop);
 	if (nfilecounts ==0)return S_OK;
-	return Filesumsave(file);
+	return Filesum(file);
 }

@@ -142,25 +142,20 @@
     <Text Include="ReadMe.md" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Hashsum.h" />
     <ClInclude Include="Kismet.h" />
     <ClInclude Include="MessageWindow.h" />
     <ClInclude Include="NeonWindow.h" />
     <ClInclude Include="Resource.h" />
-    <ClInclude Include="Securehash.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Hashsum.cpp" />
     <ClCompile Include="Kismet.cpp" />
     <ClCompile Include="KismetDiscover.cpp" />
-    <ClCompile Include="MD5.cpp" />
     <ClCompile Include="MessageWindow.cpp" />
     <ClCompile Include="NeonWindow.cpp" />
-    <ClCompile Include="Securehash.cpp" />
-    <ClCompile Include="SHA1.cpp" />
-    <ClCompile Include="SHA1DC.cpp" />
-    <ClCompile Include="SHA2.cpp" />
-    <ClCompile Include="SHA3.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -176,7 +171,7 @@
     <Image Include="small.ico" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\rhash\rhash.vcxproj">
+    <ProjectReference Include="..\Hashsum\Hashsum.vcxproj">
       <Project>{3492c5d3-64d7-4031-9991-7f3bce5cfcb2}</Project>
     </ProjectReference>
   </ItemGroup>

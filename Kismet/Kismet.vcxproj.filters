@@ -30,10 +30,10 @@
     <ClInclude Include="NeonWindow.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Securehash.h">
+    <ClInclude Include="MessageWindow.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="MessageWindow.h">
+    <ClInclude Include="Hashsum.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -47,28 +47,13 @@
     <ClCompile Include="NeonWindow.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Securehash.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="MD5.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="SHA1.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="SHA2.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="SHA3.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="KismetDiscover.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="SHA1DC.cpp">
+    <ClCompile Include="MessageWindow.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="MessageWindow.cpp">
+    <ClCompile Include="Hashsum.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

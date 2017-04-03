@@ -10,7 +10,8 @@
 #include <wincodec.h>
 #include <vector>
 #include <string>
-#include "Securehash.h"
+#include <atomic>
+//#include "Securehash.h"
 #include "Kismet.h"
 
 
@@ -75,7 +76,7 @@ private:
 		UINT height
 	);
 	/////////// self control handle
-	LRESULT Filesumsave(const std::wstring &file);
+	LRESULT Filesum(const std::wstring &file);
 	void UpdateTitle(const std::wstring &title_);
 	bool UpdateTheme();
 	HWND hCombo{ nullptr };
@@ -86,11 +87,10 @@ private:
 	HBRUSH hBrush{ nullptr };
 	HBRUSH hBrushContent{ nullptr };
 	NeonSettings ns;
-	FilesumEm fse;
-	std::mutex mtx;
 	std::wstring content;
-	std::uint32_t progress{ 0 };
-
+	std::atomic_uint32_t progress{ 0 };
+	std::atomic_bool locked{ false };
+	bool showerror{ false };
 
 public:
 	NeonWindow(const NeonWindow &) = delete;
