@@ -258,8 +258,34 @@ bool NeonWindow::FilesumInvoke(std::int32_t state, std::uint32_t pg, std::wstrin
 		content.assign(std::move(data));
 		break;
 	case kFilesumCompleted:
-		content.append(data);
 		hash.assign(data);
+		if (pg == 1) {
+			if (hash.size() > 96) {
+				content.append(hash.substr(0, 48))
+					.append(L"\r\n\t")
+					.append(hash.substr(48,48))
+					.append(L"\r\n\t")
+					.append(hash.substr(96));
+			}else if (hash.size() > 48) {
+				content.append(hash.substr(0, 48))
+					.append(L"\r\n\t")
+					.append(hash.substr(48));
+			}
+			else {
+				content.append(hash);
+			}
+		}
+		else {
+			if (hash.size() > 64) {
+				content.append(hash.substr(0, 64))
+					.append(L"\r\n\t")
+					.append(hash.substr(64));
+			}
+			else {
+				content.append(hash);
+			}
+		}
+
 		break;
 	case kFilesumProgress:
 		progress = pg;
@@ -626,7 +652,7 @@ LRESULT NeonWindow::Filesum(const std::wstring & file)
 		CloseHandle(hFile);
 		std::wstring hash;
 		sum->Final(ucase, hash);
-		FilesumInvoke(kFilesumCompleted, 100, hash);
+		FilesumInvoke(kFilesumCompleted, ucase ? 1 : 0, hash);
 		return true;
 	}).then([this](bool result) {
 		if (!result) {
