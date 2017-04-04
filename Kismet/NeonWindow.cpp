@@ -317,7 +317,7 @@ inline bool InitializeComboHash(HWND hWnd) {
 	for (auto c : hash) {
 		::SendMessage(hWnd, CB_ADDSTRING, 0, (LPARAM)c);
 	}
-	::SendMessage(hWnd, CB_SETCURSEL, N > 0 ? N : 0, 0);
+	::SendMessage(hWnd, CB_SETCURSEL, 0, 0);
 	return true;
 }
 
@@ -594,8 +594,7 @@ LRESULT NeonWindow::Filesum(const std::wstring & file)
 	if (!HashsumAlgmCheck(ComboBox_GetCurSel(hCombo), aw)) {
 		return false;
 	}
-	//// create task
-	//std::wstring title = L"[" + aw.name + L"] ";
+
 	std::wstring title;
 	title.append(L"(").append(aw.name).append(L") ").append(PathFindFileNameW(file.data()));
 	UpdateTitle(title);
