@@ -100,6 +100,7 @@ private:
 	HBRUSH hBrush{ nullptr };
 	NeonSettings ns;
 	std::wstring content;
+	std::wstring hashtext;
 	std::wstring hash;
 	std::atomic_uint32_t progress{ 0 };
 	std::atomic_bool locked{ false };

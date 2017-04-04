@@ -260,16 +260,16 @@ bool NeonWindow::FilesumInvoke(std::int32_t state, std::uint32_t pg, std::wstrin
 	case kFilesumCompleted:
 		hash.assign(data);
 		if (pg == 1) {
-			if (hash.size() > 96) {
-				content.append(hash.substr(0, 48))
+			if (hash.size() > 112) {
+				content.append(hash.substr(0, 56))
 					.append(L"\r\n\t")
-					.append(hash.substr(48,48))
+					.append(hash.substr(56,56))
 					.append(L"\r\n\t")
-					.append(hash.substr(96));
-			}else if (hash.size() > 48) {
-				content.append(hash.substr(0, 48))
+					.append(hash.substr(112));
+			}else if (hash.size() > 60) {
+				content.append(hash.substr(0, 56))
 					.append(L"\r\n\t")
-					.append(hash.substr(48));
+					.append(hash.substr(56));
 			}
 			else {
 				content.append(hash);
@@ -333,47 +333,47 @@ inline bool HashsumAlgmCheck(int i, FilesumAlgw &aw) {
 		break;
 	case 2:
 		aw.alm = kFilesumSHA1DC;
-		aw.name = L"S1-DC";
+		aw.name = L"SHA1-DC";
 		break;
 	case 3:
 		aw.alm = kFilesumSHA2;
 		aw.width = 224;
-		aw.name = L"S2-224";
+		aw.name = L"SHA224";
 		break;
 	case 4:
 		aw.alm = kFilesumSHA2;
 		aw.width = 256;
-		aw.name = L"S2-256";
+		aw.name = L"SHA256";
 		break;
 	case 5:
 		aw.alm = kFilesumSHA2;
 		aw.width = 384;
-		aw.name = L"S2-384";
+		aw.name = L"SHA384";
 		break;
 	case 6:
 		aw.alm = kFilesumSHA2;
-		aw.name = L"S2-512";
+		aw.name = L"SHA512";
 		aw.width = 512;
 		break;
 	case 7:
 		aw.alm = kFilesumSHA3;
 		aw.width = 224;
-		aw.name = L"S3-224";
+		aw.name = L"SHA3-224";
 		break;
 	case 8:
 		aw.alm = kFilesumSHA3;
 		aw.width = 256;
-		aw.name = L"S3-256";
+		aw.name = L"SHA3-256";
 		break;
 	case 9:
 		aw.alm = kFilesumSHA3;
 		aw.width = 384;
-		aw.name = L"S3-384";
+		aw.name = L"SHA3-384";
 		break;
 	case 10:
 		aw.alm = kFilesumSHA3;
 		aw.width = 512;
-		aw.name = L"S3-512";
+		aw.name = L"SHA3-512";
 		break;
 	default:
 		return false;
@@ -595,7 +595,10 @@ LRESULT NeonWindow::Filesum(const std::wstring & file)
 		return false;
 	}
 	//// create task
-	UpdateTitle(PathFindFileNameW(file.data()));
+	//std::wstring title = L"[" + aw.name + L"] ";
+	std::wstring title;
+	title.append(L"(").append(aw.name).append(L") ").append(PathFindFileNameW(file.data()));
+	UpdateTitle(title);
 	showerror = false;
 	Concurrency::create_task([this, file,aw,ucase]()->bool {
 		std::shared_ptr<Hashsum> sum(CreateHashsum(file, aw.alm, aw.width));
@@ -630,7 +633,7 @@ LRESULT NeonWindow::Filesum(const std::wstring & file)
 			filename = file;
 		}
 		_snwprintf_s(Ptr, sizeof(buffer) / 2, sizeof(buffer) / 2,
-			L"File:\t%s\r\nSize:\t%lld\r\n%s:\t", filename.data(), li.QuadPart,aw.name.data());
+			L"File:\t%s\r\nSize:\t%lld\r\nHash:\t", filename.data(), li.QuadPart);
 		FilesumInvoke(kFilesumMessage, 0, Ptr);
 		DWORD dwRead;
 		int64_t cmsize = 0;
