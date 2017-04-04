@@ -67,7 +67,7 @@ LRESULT NeonWindow::InitializeWindow()
 	}
 	width = 700;
 	height = 370;
-	areaheigh = 250;
+	areaheight = 250;
 	Create(nullptr, layout, ns.title.data(),
 		WS_NORESIZEWINDOW,
 		WS_EX_APPWINDOW | WS_EX_WINDOWEDGE);
@@ -149,18 +149,50 @@ HRESULT NeonWindow::OnRender() {
 			pHwndRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
 			pHwndRenderTarget->Clear(D2D1::ColorF(ns.contentcolor));
 			pHwndRenderTarget->FillRectangle(
-				D2D1::RectF(0,areaheigh,size.width,size.height),
+				D2D1::RectF(0,areaheight,size.width,size.height),
 				AppPageBackgroundThemeBrush);
 			wchar_t uppercase[] = L"Uppercase";
 			pHwndRenderTarget->DrawTextW(uppercase, 9,
 				pLabelWriteTextFormat,
-				D2D1::RectF(40, areaheigh+28.0f,200.0f, areaheigh+50.0f), AppPageTextBrush,
+				D2D1::RectF(40, areaheight+28.0f,200.0f, areaheight+50.0f), AppPageTextBrush,
 				D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT,
 				DWRITE_MEASURING_MODE_NATURAL);
-			if (content.size()) {
-				pHwndRenderTarget->DrawTextW(content.data(), content.size(),
+			if (filetext.size()) {
+				const wchar_t Name[] = L"Name:";
+				pHwndRenderTarget->DrawTextW(Name, 5,
 					pLabelWriteTextFormat,
-					D2D1::RectF(20, 0.0f, size.width-20, size.height - 100.0f), AppPageTextBrush,
+					D2D1::RectF(20, 0.0f, keywidth, lineheight), AppPageTextBrush,
+					D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT,
+					DWRITE_MEASURING_MODE_NATURAL);
+					pHwndRenderTarget->DrawTextW(filetext.data(), filetext.size(),
+						pLabelWriteTextFormat,
+						D2D1::RectF(keywidth, 0.0f, size.width-20, lineheight), AppPageTextBrush,
+						D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT,
+						DWRITE_MEASURING_MODE_NATURAL);
+			}
+			if (sizetext.size()) {
+				const wchar_t Size[] = L"Size:";
+				pHwndRenderTarget->DrawTextW(Size, 5,
+					pLabelWriteTextFormat,
+					D2D1::RectF(20, lineheight, keywidth, lineheight*2), AppPageTextBrush,
+					D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT,
+					DWRITE_MEASURING_MODE_NATURAL);
+				pHwndRenderTarget->DrawTextW(sizetext.data(), sizetext.size(),
+					pLabelWriteTextFormat,
+					D2D1::RectF(keywidth, lineheight, size.width - 20, lineheight*2), AppPageTextBrush,
+					D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT,
+					DWRITE_MEASURING_MODE_NATURAL);
+			}
+			if (hash.size()) {
+				const wchar_t Size[] = L"Hash:";
+				pHwndRenderTarget->DrawTextW(Size, 5,
+					pLabelWriteTextFormat,
+					D2D1::RectF(20, lineheight*2, keywidth, lineheight * 3), AppPageTextBrush,
+					D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT,
+					DWRITE_MEASURING_MODE_NATURAL);
+				pHwndRenderTarget->DrawTextW(hash.data(), hash.size(),
+					pLabelWriteTextFormat,
+					D2D1::RectF(keywidth, lineheight*2, size.width - 20, lineheight * 5), AppPageTextBrush,
 					D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT,
 					DWRITE_MEASURING_MODE_NATURAL);
 			}
@@ -169,7 +201,7 @@ HRESULT NeonWindow::OnRender() {
 				wchar_t text[] = L"\xD83D\xDCAF";
 				pHwndRenderTarget->DrawTextW(
 					text, 2, pLabelWriteTextFormat,
-					D2D1::RectF(160.0f, areaheigh + 28.0f, 250.0f, areaheigh + 50.5f),
+					D2D1::RectF(160.0f, areaheight + 28.0f, 250.0f, areaheight + 50.5f),
 					AppPageTextBrush, D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT,
 					DWRITE_MEASURING_MODE_NATURAL);
 			}
@@ -177,15 +209,15 @@ HRESULT NeonWindow::OnRender() {
 				auto progressText = std::to_wstring(progress) + L"%";
 				pHwndRenderTarget->DrawTextW(
 					progressText.c_str(), progressText.size(), pLabelWriteTextFormat,
-					D2D1::RectF(160.0f, areaheigh + 28.0f, 250.0f, areaheigh + 50.5f),
+					D2D1::RectF(160.0f, areaheight + 28.0f, 250.0f, areaheight + 50.5f),
 					AppPageTextBrush, D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT,
 					DWRITE_MEASURING_MODE_NATURAL);
 			}
 			else if (showerror) {
-				wchar_t text[] = L"\x3DD8\x14DE";
+				wchar_t text[] = L"\xD83D\xDE1F";
 				pHwndRenderTarget->DrawTextW(
 					text, 2, pLabelWriteTextFormat,
-					D2D1::RectF(160.0f, areaheigh + 28.0f, 250.0f, areaheigh + 50.5f),
+					D2D1::RectF(160.0f, areaheight + 28.0f, 250.0f, areaheight + 50.5f),
 					AppPageTextBrush, D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT,
 					DWRITE_MEASURING_MODE_NATURAL);
 			}
@@ -255,37 +287,9 @@ bool NeonWindow::FilesumInvoke(std::int32_t state, std::uint32_t pg, std::wstrin
 	case kFilesumBroken:
 		return false;
 	case kFilesumMessage:
-		content.assign(std::move(data));
 		break;
 	case kFilesumCompleted:
 		hash.assign(data);
-		if (pg == 1) {
-			if (hash.size() > 112) {
-				content.append(hash.substr(0, 56))
-					.append(L"\r\n\t")
-					.append(hash.substr(56,56))
-					.append(L"\r\n\t")
-					.append(hash.substr(112));
-			}else if (hash.size() > 60) {
-				content.append(hash.substr(0, 56))
-					.append(L"\r\n\t")
-					.append(hash.substr(56));
-			}
-			else {
-				content.append(hash);
-			}
-		}
-		else {
-			if (hash.size() > 64) {
-				content.append(hash.substr(0, 64))
-					.append(L"\r\n\t")
-					.append(hash.substr(64));
-			}
-			else {
-				content.append(hash);
-			}
-		}
-
 		break;
 	case kFilesumProgress:
 		progress = pg;
@@ -442,22 +446,22 @@ LRESULT NeonWindow::OnCreate(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL & bHa
 	hCheck = LambdaCreateWindow(WC_BUTTONW, 
 		L"", 
 		KWS_CHECKBOX, 
-		20, areaheigh+30, 20, 20, nullptr);
+		20, areaheight+30, 20, 20, nullptr);
 
 	hCombo = LambdaCreateWindow(WC_COMBOBOXW, L"",
 		KWS_COMBOBOX,
-		width- 420, areaheigh+25, 120, 27, nullptr);
+		width- 420, areaheight+25, 120, 27, nullptr);
 
 	hOpenButton = LambdaCreateWindow(WC_BUTTONW,
 		L"Clear",
 		KWS_BUTTON,
-		width - 290, areaheigh+25, 120, 27,
+		width - 290, areaheight+25, 120, 27,
 		HMENU(IDC_CLEAR_BUTTON));
 
 	hOpenButton = LambdaCreateWindow(WC_BUTTONW, 
 		L"Open", 
 		KWS_BUTTON,
-		width-160, areaheigh+25, 120, 27, 
+		width-160, areaheight+25, 120, 27, 
 		HMENU(IDC_FILEOPEN_BUTTON));
 
 	InitializeComboHash(hCombo);
@@ -554,7 +558,7 @@ LRESULT NeonWindow::OnRButtonUp(UINT, WPARAM wParam, LPARAM lParam, BOOL & bHand
 	GetCursorPos(&pt);
 	auto ptc = pt;
 	ScreenToClient(&pt);
-	if (pt.y >= (LONG)areaheigh) {
+	if (pt.y >= (LONG)areaheight) {
 		//// NOT Area
 		return S_OK;
 	}
@@ -575,7 +579,8 @@ LRESULT NeonWindow::OnRButtonUp(UINT, WPARAM wParam, LPARAM lParam, BOOL & bHand
 LRESULT NeonWindow::OnContentClear(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL & bHandled)
 {
 	if (!locked) {
-		content.clear();
+		filetext.clear();
+		sizetext.clear();
 		hash.clear();
 		progress = 0;
 		UpdateTitle(L"");
@@ -586,6 +591,9 @@ LRESULT NeonWindow::OnContentClear(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOO
 
 LRESULT NeonWindow::Filesum(const std::wstring & file)
 {
+	if (file.empty()) {
+		return S_FALSE;
+	}
 	if (locked) {
 		return S_FALSE;
 	}
@@ -619,21 +627,18 @@ LRESULT NeonWindow::Filesum(const std::wstring & file)
 		LARGE_INTEGER li;
 		GetFileSizeEx(hFile, &li);
 		auto Ptr = reinterpret_cast<wchar_t *>(buffer);
-		std::wstring filename;
 		if (file.size() > 64) {
-			filename.assign(PathFindFileNameW(file.data()));
-			if (filename.size() > 64)
+			filetext.assign(PathFindFileNameW(file.data()));
+			if (filetext.size() > 64)
 			{
-				filename.resize(64);
-				filename.append(L"...");
+				filetext.resize(64);
+				filetext.append(L"...");
 			}
 		}
 		else {
-			filename = file;
+			filetext = file;
 		}
-		_snwprintf_s(Ptr, sizeof(buffer) / 2, sizeof(buffer) / 2,
-			L"File:\t%s\r\nSize:\t%lld\r\nHash:\t", filename.data(), li.QuadPart);
-		FilesumInvoke(kFilesumMessage, 0, Ptr);
+		sizetext.assign(std::to_wstring(li.QuadPart));
 		DWORD dwRead;
 		int64_t cmsize = 0;
 		for (;;) {
@@ -652,9 +657,8 @@ LRESULT NeonWindow::Filesum(const std::wstring & file)
 				break;
 		}
 		CloseHandle(hFile);
-		std::wstring hash;
+		hash.clear();
 		sum->Final(ucase, hash);
-		FilesumInvoke(kFilesumCompleted, ucase ? 1 : 0, hash);
 		return true;
 	}).then([this](bool result) {
 		if (!result) {

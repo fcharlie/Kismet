@@ -99,14 +99,16 @@ private:
 	HWND hCheck{ nullptr };
 	HBRUSH hBrush{ nullptr };
 	NeonSettings ns;
-	std::wstring content;
-	std::wstring hashtext;
+	std::wstring filetext;
+	std::wstring sizetext;
 	std::wstring hash;
 	std::atomic_uint32_t progress{ 0 };
 	std::atomic_bool locked{ false };
 	std::uint32_t height;
 	std::uint32_t width;
-	std::uint32_t areaheigh;
+	std::uint32_t areaheight;
+	std::uint32_t keywidth{ 100 };
+	std::uint32_t lineheight{20};
 	bool showerror{ false };
 
 public:

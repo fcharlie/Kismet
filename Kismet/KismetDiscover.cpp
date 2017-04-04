@@ -59,7 +59,7 @@ bool KismetDiscoverWindow(
 	hr = pWindow->Show(hParent);
 	if (hr == HRESULT_FROM_WIN32(ERROR_CANCELLED)) {
 		// User cancelled.
-		hr = S_OK;
+		hr = S_FALSE;
 		goto done;
 	}
 	if (FAILED(hr)) { goto done; }
