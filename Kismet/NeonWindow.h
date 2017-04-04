@@ -42,6 +42,13 @@ inline COLORREF calcLuminance(UINT32 cr) {
 	return RGB(r,g,b);
 }
 
+
+struct D2D1Checkbox {
+	RECT Layout;
+	std::wstring Text;
+	bool IsChecked;
+};
+
 #define NEONWINDOWNAME L"Neon.UI.Window"
 
 #ifndef SYSCOMMAND_ID_HANDLER
@@ -59,14 +66,18 @@ inline COLORREF calcLuminance(UINT32 cr) {
 WS_MINIMIZEBOX | WS_CLIPCHILDREN | WS_CLIPSIBLINGS&~WS_MAXIMIZEBOX
 typedef CWinTraits<NEON_WINDOW_CLASSSTYLE, WS_EX_APPWINDOW | WS_EX_WINDOWEDGE> CMetroWindowTraits;
 
+
+///Awesome 
 class NeonWindow :public CWindowImpl<NeonWindow, CWindow, CMetroWindowTraits> {
 private:
-	ID2D1Factory *m_pFactory;
-	ID2D1HwndRenderTarget* m_pHwndRenderTarget;
-	ID2D1SolidColorBrush* m_pBackgroundBrush;
-	ID2D1SolidColorBrush* m_pNormalTextBrush;
-	IDWriteTextFormat* m_pWriteTextFormat;
-	IDWriteFactory* m_pWriteFactory;
+	ID2D1Factory *pFactory;
+	ID2D1HwndRenderTarget* pHwndRenderTarget;
+	ID2D1SolidColorBrush* AppPageBackgroundThemeBrush;
+	ID2D1SolidColorBrush* AppPageTextBrush;
+	IDWriteFactory* pWriteFactory;
+	//IDWriteTextFormat* pTitleWriteTextFormat;//Alignment left
+	//IDWriteTextFormat* pButtonWriteTextFormat; /// Alignment center
+	IDWriteTextFormat* pLabelWriteTextFormat; /// Alignment left
 	HRESULT CreateDeviceIndependentResources();
 	HRESULT Initialize();
 	HRESULT CreateDeviceResources();

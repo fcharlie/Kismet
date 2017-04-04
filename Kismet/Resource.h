@@ -14,8 +14,11 @@
 
 
 #define IDI_KISMET			101
-#define IDM_KISMET_CONTEXT 102
-#define IDM_CONTEXT_COPY   103
-#define IDM_CONTEXT_COPYALL       104
+#define IDI_ICON_APP     102
+#define IDI_ICON_PANTONE  103
+
+#define IDM_KISMET_CONTEXT 110
+#define IDM_CONTEXT_COPY   111
+#define IDM_CONTEXT_COPYALL       112
 
 

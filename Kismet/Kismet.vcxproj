@@ -167,9 +167,6 @@
     <ResourceCompile Include="Kismet.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Kismet.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Hashsum\Hashsum.vcxproj">
       <Project>{3492c5d3-64d7-4031-9991-7f3bce5cfcb2}</Project>
     </ProjectReference>

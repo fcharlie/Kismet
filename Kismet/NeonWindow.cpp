@@ -37,23 +37,23 @@ SafeRelease(
 }
 
 NeonWindow::NeonWindow()
-	:m_pFactory(nullptr),
-	m_pBackgroundBrush(nullptr),
-	m_pNormalTextBrush(nullptr),
-	m_pHwndRenderTarget(nullptr),
-	m_pWriteFactory(nullptr),
-	m_pWriteTextFormat(nullptr)
+	:pFactory(nullptr),
+	AppPageBackgroundThemeBrush(nullptr),
+	AppPageTextBrush(nullptr),
+	pHwndRenderTarget(nullptr),
+	pWriteFactory(nullptr),
+	pLabelWriteTextFormat(nullptr)
 {
 }
 
 NeonWindow::~NeonWindow()
 {
-	SafeRelease(&m_pWriteTextFormat);
-	SafeRelease(&m_pWriteFactory);
-	SafeRelease(&m_pBackgroundBrush);
-	SafeRelease(&m_pNormalTextBrush);
-	SafeRelease(&m_pHwndRenderTarget);
-	SafeRelease(&m_pFactory);
+	SafeRelease(&pLabelWriteTextFormat);
+	SafeRelease(&pWriteFactory);
+	SafeRelease(&AppPageBackgroundThemeBrush);
+	SafeRelease(&AppPageTextBrush);
+	SafeRelease(&pHwndRenderTarget);
+	SafeRelease(&pFactory);
 }
 #define WS_NORESIZEWINDOW (WS_OVERLAPPED | WS_CAPTION |WS_SYSMENU | \
  WS_CLIPCHILDREN | WS_MINIMIZEBOX )
@@ -77,13 +77,13 @@ LRESULT NeonWindow::InitializeWindow()
 /////
 HRESULT NeonWindow::CreateDeviceIndependentResources() {
 	HRESULT hr = S_OK;
-	hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &m_pFactory);
+	hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &pFactory);
 	if (SUCCEEDED(hr)) {
 		hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED,
 			__uuidof(IDWriteFactory),
-			reinterpret_cast<IUnknown**>(&m_pWriteFactory));
+			reinterpret_cast<IUnknown**>(&pWriteFactory));
 		if (SUCCEEDED(hr)) {
-			hr = m_pWriteFactory->CreateTextFormat(
+			hr = pWriteFactory->CreateTextFormat(
 				L"Segoe UI",
 				NULL,
 				DWRITE_FONT_WEIGHT_NORMAL,
@@ -91,7 +91,7 @@ HRESULT NeonWindow::CreateDeviceIndependentResources() {
 				DWRITE_FONT_STRETCH_NORMAL,
 				16.0f,
 				L"zh-CN",
-				&m_pWriteTextFormat);
+				&pLabelWriteTextFormat);
 		}
 
 	}
@@ -100,43 +100,43 @@ HRESULT NeonWindow::CreateDeviceIndependentResources() {
 HRESULT NeonWindow::Initialize() {
 	auto hr = CreateDeviceIndependentResources();
 	FLOAT dpiX, dpiY;
-	m_pFactory->GetDesktopDpi(&dpiX, &dpiY);
+	pFactory->GetDesktopDpi(&dpiX, &dpiY);
 	return hr;
 }
 HRESULT NeonWindow::CreateDeviceResources() {
 	HRESULT hr = S_OK;
 
-	if (!m_pHwndRenderTarget) {
+	if (!pHwndRenderTarget) {
 		RECT rc;
 		::GetClientRect(m_hWnd, &rc);
 		D2D1_SIZE_U size = D2D1::SizeU(
 			rc.right - rc.left,
 			rc.bottom - rc.top
 		);
-		hr = m_pFactory->CreateHwndRenderTarget(
+		hr = pFactory->CreateHwndRenderTarget(
 			D2D1::RenderTargetProperties(),
 			D2D1::HwndRenderTargetProperties(m_hWnd, size),
-			&m_pHwndRenderTarget
+			&pHwndRenderTarget
 		);
 		if (SUCCEEDED(hr)) {
 			////
-			hr = m_pHwndRenderTarget->CreateSolidColorBrush(
+			hr = pHwndRenderTarget->CreateSolidColorBrush(
 				D2D1::ColorF((UINT32)ns.panelcolor),
-				&m_pBackgroundBrush
+				&AppPageBackgroundThemeBrush
 			);
 		}
 		if (SUCCEEDED(hr)) {
-			hr = m_pHwndRenderTarget->CreateSolidColorBrush(
+			hr = pHwndRenderTarget->CreateSolidColorBrush(
 				D2D1::ColorF(ns.labelcolor),
-				&m_pNormalTextBrush
+				&AppPageTextBrush
 			);
 		}
 	}
 	return hr;
 }
 void NeonWindow::DiscardDeviceResources() {
-	SafeRelease(&m_pBackgroundBrush);
-	SafeRelease(&m_pNormalTextBrush);
+	SafeRelease(&AppPageBackgroundThemeBrush);
+	SafeRelease(&AppPageTextBrush);
 }
 HRESULT NeonWindow::OnRender() {
 	auto hr = CreateDeviceResources();
@@ -144,52 +144,52 @@ HRESULT NeonWindow::OnRender() {
 #pragma warning(disable:4244)
 #pragma warning(disable:4267)
 		if (SUCCEEDED(hr)) {
-			auto size = m_pHwndRenderTarget->GetSize();
-			m_pHwndRenderTarget->BeginDraw();
-			m_pHwndRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
-			m_pHwndRenderTarget->Clear(D2D1::ColorF(ns.contentcolor));
-			m_pHwndRenderTarget->FillRectangle(
+			auto size = pHwndRenderTarget->GetSize();
+			pHwndRenderTarget->BeginDraw();
+			pHwndRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
+			pHwndRenderTarget->Clear(D2D1::ColorF(ns.contentcolor));
+			pHwndRenderTarget->FillRectangle(
 				D2D1::RectF(0,areaheigh,size.width,size.height),
-				m_pBackgroundBrush);
+				AppPageBackgroundThemeBrush);
 			wchar_t uppercase[] = L"Uppercase";
-			m_pHwndRenderTarget->DrawTextW(uppercase, 9,
-				m_pWriteTextFormat,
-				D2D1::RectF(40, areaheigh+28.0f,200.0f, areaheigh+50.0f), m_pNormalTextBrush,
+			pHwndRenderTarget->DrawTextW(uppercase, 9,
+				pLabelWriteTextFormat,
+				D2D1::RectF(40, areaheigh+28.0f,200.0f, areaheigh+50.0f), AppPageTextBrush,
 				D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT,
 				DWRITE_MEASURING_MODE_NATURAL);
 			if (content.size()) {
-				m_pHwndRenderTarget->DrawTextW(content.data(), content.size(),
-					m_pWriteTextFormat,
-					D2D1::RectF(20, 0.0f, size.width-20, size.height - 100.0f), m_pNormalTextBrush,
+				pHwndRenderTarget->DrawTextW(content.data(), content.size(),
+					pLabelWriteTextFormat,
+					D2D1::RectF(20, 0.0f, size.width-20, size.height - 100.0f), AppPageTextBrush,
 					D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT,
 					DWRITE_MEASURING_MODE_NATURAL);
 			}
 			//// write progress 100 %
 			if (progress == 100) {
 				wchar_t text[] = L"\xD83D\xDCAF";
-				m_pHwndRenderTarget->DrawTextW(
-					text, 2, m_pWriteTextFormat,
+				pHwndRenderTarget->DrawTextW(
+					text, 2, pLabelWriteTextFormat,
 					D2D1::RectF(160.0f, areaheigh + 28.0f, 250.0f, areaheigh + 50.5f),
-					m_pNormalTextBrush, D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT,
+					AppPageTextBrush, D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT,
 					DWRITE_MEASURING_MODE_NATURAL);
 			}
 			else if (progress > 0 && progress < 100) {
 				auto progressText = std::to_wstring(progress) + L"%";
-				m_pHwndRenderTarget->DrawTextW(
-					progressText.c_str(), progressText.size(), m_pWriteTextFormat,
+				pHwndRenderTarget->DrawTextW(
+					progressText.c_str(), progressText.size(), pLabelWriteTextFormat,
 					D2D1::RectF(160.0f, areaheigh + 28.0f, 250.0f, areaheigh + 50.5f),
-					m_pNormalTextBrush, D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT,
+					AppPageTextBrush, D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT,
 					DWRITE_MEASURING_MODE_NATURAL);
 			}
 			else if (showerror) {
 				wchar_t text[] = L"\x3DD8\x14DE";
-				m_pHwndRenderTarget->DrawTextW(
-					text, 2, m_pWriteTextFormat,
+				pHwndRenderTarget->DrawTextW(
+					text, 2, pLabelWriteTextFormat,
 					D2D1::RectF(160.0f, areaheigh + 28.0f, 250.0f, areaheigh + 50.5f),
-					m_pNormalTextBrush, D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT,
+					AppPageTextBrush, D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT,
 					DWRITE_MEASURING_MODE_NATURAL);
 			}
-			hr = m_pHwndRenderTarget->EndDraw();
+			hr = pHwndRenderTarget->EndDraw();
 		}
 		if (hr == D2DERR_RECREATE_TARGET) {
 			hr = S_OK;
@@ -217,8 +217,8 @@ void NeonWindow::OnResize(
 	UINT height
 )
 {
-	if (m_pHwndRenderTarget) {
-		m_pHwndRenderTarget->Resize(D2D1::SizeU(width, height));
+	if (pHwndRenderTarget) {
+		pHwndRenderTarget->Resize(D2D1::SizeU(width, height));
 	}
 }
 
@@ -237,10 +237,10 @@ bool NeonWindow::UpdateTheme()
 		DeleteObject(hBrush);
 	}
 	hBrush = CreateSolidBrush(calcLuminance(ns.panelcolor));
-	SafeRelease(&m_pBackgroundBrush);
-	auto hr = m_pHwndRenderTarget->CreateSolidColorBrush(
+	SafeRelease(&AppPageBackgroundThemeBrush);
+	auto hr = pHwndRenderTarget->CreateSolidColorBrush(
 		D2D1::ColorF((UINT32)ns.panelcolor),
-		&m_pBackgroundBrush
+		&AppPageBackgroundThemeBrush
 	);
 	::InvalidateRect(hCheck, nullptr, TRUE);
 	InvalidateRect(nullptr, TRUE);
@@ -521,6 +521,7 @@ LRESULT NeonWindow::OnColorButton(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL 
 	return (LRESULT)((HRESULT)hBrush);
 }
 
+
 LRESULT NeonWindow::OnRButtonUp(UINT, WPARAM wParam, LPARAM lParam, BOOL & bHandled)
 {
 	POINT pt;
@@ -533,18 +534,13 @@ LRESULT NeonWindow::OnRButtonUp(UINT, WPARAM wParam, LPARAM lParam, BOOL & bHand
 	}
 	HMENU hMenu = ::LoadMenuW(GetModuleHandle(nullptr), MAKEINTRESOURCEW(IDM_KISMET_CONTEXT));
 	HMENU hPopu = GetSubMenu(hMenu, 0);
-	if (content.empty()) {
-		EnableMenuItem(hPopu, IDM_CONTEXT_COPYALL, MF_DISABLED);
-	}
-	else {
-		EnableMenuItem(hPopu, IDM_CONTEXT_COPYALL, MF_ENABLED);
-	}
 	if (hash.empty()) {
 		EnableMenuItem(hPopu, IDM_CONTEXT_COPY, MF_DISABLED);
 	}
 	else {
 		EnableMenuItem(hPopu, IDM_CONTEXT_COPY, MF_ENABLED);
 	}
+
 	::TrackPopupMenuEx(hPopu, TPM_RIGHTBUTTON, ptc.x, ptc.y, m_hWnd, nullptr);
 	::DestroyMenu(hPopu);
 	return S_OK;
