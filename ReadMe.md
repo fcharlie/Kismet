@@ -1,13 +1,21 @@
 # Kismet File Hashsum
 
 
+## None
+
+![image](./docs/images/none.png)
+
 ## MD5
 
 ![image](./docs/images/md5.png)
 
 ## SHA1 Collision Detection
+
 ![image](./docs/images/coll.png)
 
+## Progress
+
+![image](./docs/images/progress.png)
 
 ## Complete
 

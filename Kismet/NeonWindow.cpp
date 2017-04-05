@@ -221,6 +221,14 @@ HRESULT NeonWindow::OnRender() {
 					AppPageTextBrush, D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT,
 					DWRITE_MEASURING_MODE_NATURAL);
 			}
+			else {
+				wchar_t text[] = L"\x2764Kismet";
+				pHwndRenderTarget->DrawTextW(
+					text, 7, pLabelWriteTextFormat,
+					D2D1::RectF(160.0f, areaheight + 28.0f, 250.0f, areaheight + 50.5f),
+					AppPageTextBrush, D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT,
+					DWRITE_MEASURING_MODE_NATURAL);
+			}
 			hr = pHwndRenderTarget->EndDraw();
 		}
 		if (hr == D2DERR_RECREATE_TARGET) {
@@ -283,17 +291,16 @@ bool NeonWindow::UpdateTheme()
 
 bool NeonWindow::FilesumInvoke(std::int32_t state, std::uint32_t pg, std::wstring data)
 {
+	static std::uint32_t progress_=0;
 	switch (state) {
 	case kFilesumBroken:
 		return false;
-	case kFilesumMessage:
-		break;
-	case kFilesumCompleted:
-		hash.assign(data);
-		break;
 	case kFilesumProgress:
 		progress = pg;
-		InvalidateRect(nullptr, false);
+		if (pg != progress_) {
+			progress_ = pg;
+			InvalidateRect(nullptr);
+		}
 		break;
 	default:
 		return false;
@@ -582,6 +589,7 @@ LRESULT NeonWindow::OnContentClear(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOO
 		filetext.clear();
 		sizetext.clear();
 		hash.clear();
+		showerror = false;
 		progress = 0;
 		UpdateTitle(L"");
 		InvalidateRect(nullptr, false);
@@ -602,7 +610,10 @@ LRESULT NeonWindow::Filesum(const std::wstring & file)
 	if (!HashsumAlgmCheck(ComboBox_GetCurSel(hCombo), aw)) {
 		return false;
 	}
-
+	filetext.clear();
+	hash.clear();
+	sizetext.clear();
+	//InvalidateRect(nullptr);
 	std::wstring title;
 	title.append(L"(").append(aw.name).append(L") ").append(PathFindFileNameW(file.data()));
 	UpdateTitle(title);
@@ -664,6 +675,7 @@ LRESULT NeonWindow::Filesum(const std::wstring & file)
 		if (!result) {
 			showerror = true;
 		}
+		//InvalidateRect(nullptr);
 		locked = false;
 	});
 	return S_OK;
