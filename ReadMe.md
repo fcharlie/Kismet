@@ -5,9 +5,6 @@
 
 ![image](./docs/images/none.png)
 
-## MD5
-
-![image](./docs/images/md5.png)
 
 ## SHA1 Collision Detection
 
