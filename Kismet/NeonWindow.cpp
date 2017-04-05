@@ -161,12 +161,12 @@ HRESULT NeonWindow::OnRender() {
 				const wchar_t Name[] = L"Name:";
 				pHwndRenderTarget->DrawTextW(Name, 5,
 					pLabelWriteTextFormat,
-					D2D1::RectF(20, 0.0f, keywidth, lineheight), AppPageTextBrush,
+					D2D1::RectF(20, 5.0f, keywidth, lineheight), AppPageTextBrush,
 					D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT,
 					DWRITE_MEASURING_MODE_NATURAL);
 					pHwndRenderTarget->DrawTextW(filetext.data(), filetext.size(),
 						pLabelWriteTextFormat,
-						D2D1::RectF(keywidth, 0.0f, size.width-20, lineheight), AppPageTextBrush,
+						D2D1::RectF(keywidth, 5.0f, size.width-20, lineheight), AppPageTextBrush,
 						D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT,
 						DWRITE_MEASURING_MODE_NATURAL);
 			}
@@ -174,12 +174,12 @@ HRESULT NeonWindow::OnRender() {
 				const wchar_t Size[] = L"Size:";
 				pHwndRenderTarget->DrawTextW(Size, 5,
 					pLabelWriteTextFormat,
-					D2D1::RectF(20, lineheight, keywidth, lineheight*2), AppPageTextBrush,
+					D2D1::RectF(20, lineheight+5.0f, keywidth, lineheight*2), AppPageTextBrush,
 					D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT,
 					DWRITE_MEASURING_MODE_NATURAL);
 				pHwndRenderTarget->DrawTextW(sizetext.data(), sizetext.size(),
 					pLabelWriteTextFormat,
-					D2D1::RectF(keywidth, lineheight, size.width - 20, lineheight*2), AppPageTextBrush,
+					D2D1::RectF(keywidth, lineheight+5.0f, size.width - 20, lineheight*2), AppPageTextBrush,
 					D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT,
 					DWRITE_MEASURING_MODE_NATURAL);
 			}
@@ -187,12 +187,12 @@ HRESULT NeonWindow::OnRender() {
 				const wchar_t Size[] = L"Hash:";
 				pHwndRenderTarget->DrawTextW(Size, 5,
 					pLabelWriteTextFormat,
-					D2D1::RectF(20, lineheight*2, keywidth, lineheight * 3), AppPageTextBrush,
+					D2D1::RectF(20, lineheight*2+5.0f, keywidth, lineheight * 3), AppPageTextBrush,
 					D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT,
 					DWRITE_MEASURING_MODE_NATURAL);
 				pHwndRenderTarget->DrawTextW(hash.data(), hash.size(),
 					pLabelWriteTextFormat,
-					D2D1::RectF(keywidth, lineheight*2, size.width - 20, lineheight * 5), AppPageTextBrush,
+					D2D1::RectF(keywidth, lineheight*2+5.0f, size.width - 20, lineheight * 5), AppPageTextBrush,
 					D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT,
 					DWRITE_MEASURING_MODE_NATURAL);
 			}
