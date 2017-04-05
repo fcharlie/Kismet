@@ -32,7 +32,7 @@ change Content color, and set your title
 
 You can use a color that fills the entire window
 
-![onecolor](./docs/images/onecolor.png)
+![theme](./docs/images/theme.png)
 
 
 WORKING IN PROGRESS
