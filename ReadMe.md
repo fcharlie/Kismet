@@ -34,5 +34,6 @@ You can use a color that fills the entire window
 
 ![theme](./docs/images/theme.png)
 
+![theme](./docs/images/theme2.png)
 
 WORKING IN PROGRESS
