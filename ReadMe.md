@@ -21,6 +21,9 @@
 
 ![complete](./docs/images/complete.png)
 
+## SHA3-512
+
+![sha3-512](./docs/images/sha3-512.png)
 
 ## Theme 
 
