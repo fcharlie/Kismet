@@ -15,6 +15,37 @@
 #include "Kismet.h"
 
 
+class AllocSingle {
+public:
+	enum {
+		kInternalBufferSize =65536,
+	};
+	AllocSingle(const AllocSingle &) = delete;
+	AllocSingle &operator=(const AllocSingle &) = delete;
+	AllocSingle() = default;
+	~AllocSingle() {
+		if (data) {
+			HeapFree(GetProcessHeap(), HEAP_ZERO_MEMORY, data);
+		}
+	}
+	template<typename T>
+	
+	T *Alloc(size_t N) {
+		if (data)return nullptr;
+		data = HeapAlloc(GetProcessHeap(), 0, N);
+		if (data != nullptr) {
+			size_ = N;
+		}
+		return reinterpret_cast<T*>(data);
+	}
+	size_t size()const {
+		return size_;
+	}
+private:
+	void *data{ nullptr };
+	size_t size_{ 0 };
+};
+
 
 struct NeonSettings {
 	/// color

@@ -577,6 +577,7 @@ LRESULT NeonWindow::OnContentClear(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOO
 	return S_OK;
 }
 
+
 LRESULT NeonWindow::Filesum(const std::wstring & file)
 {
 	if (file.empty()) {
@@ -602,6 +603,11 @@ LRESULT NeonWindow::Filesum(const std::wstring & file)
 		if (!sum) {
 			return false;
 		}
+		AllocSingle as;
+		BYTE *buffer = as.Alloc<BYTE>(AllocSingle::kInternalBufferSize);
+		if (as.size() == 0 || buffer == nullptr) {
+			return false;
+		}
 		auto hFile = CreateFileW(file.data(),
 			GENERIC_READ,
 			FILE_SHARE_READ,
@@ -612,10 +618,8 @@ LRESULT NeonWindow::Filesum(const std::wstring & file)
 		if (hFile == INVALID_HANDLE_VALUE) {
 			return false;
 		}
-		BYTE buffer[65536];
 		LARGE_INTEGER li;
 		GetFileSizeEx(hFile, &li);
-		auto Ptr = reinterpret_cast<wchar_t *>(buffer);
 		if (file.size() > 64) {
 			filetext.assign(PathFindFileNameW(file.data()));
 			if (filetext.size() > 64)
@@ -632,19 +636,19 @@ LRESULT NeonWindow::Filesum(const std::wstring & file)
 		int64_t cmsize = 0;
 		uint32_t pg = 0;
 		for (;;) {
-			if (!ReadFile(hFile, buffer, sizeof(buffer), &dwRead, nullptr)) {
+			if (!ReadFile(hFile, buffer, AllocSingle::kInternalBufferSize, &dwRead, nullptr)) {
 				break;
 			}
 			sum->Update(buffer, dwRead);
 			cmsize += dwRead;
-			auto N = cmsize * 100 / li.QuadPart;
+			auto N = (uint32_t)(cmsize * 100 / li.QuadPart);
 			progress = (uint32_t)N;
 			/// when number is modify, Flush Window
-			if (pg != (uint32_t)N) {
-				pg = N;
+			if (pg != N) {
+				pg = (uint32_t)N;
 				InvalidateRect(nullptr);
 			}
-			if (dwRead<sizeof(buffer))
+			if (dwRead<AllocSingle::kInternalBufferSize)
 				break;
 		}
 		CloseHandle(hFile);
