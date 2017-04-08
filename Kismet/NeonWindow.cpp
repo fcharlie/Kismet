@@ -293,28 +293,6 @@ bool NeonWindow::UpdateTheme()
 	return true;
 }
 
-
-
-bool NeonWindow::FilesumInvoke(std::int32_t state, std::uint32_t pg, std::wstring data)
-{
-	static std::uint32_t progress_=0;
-	switch (state) {
-	case kFilesumBroken:
-		return false;
-	case kFilesumProgress:
-		progress = pg;
-		if (pg != progress_) {
-			progress_ = pg;
-			InvalidateRect(nullptr);
-		}
-		break;
-	default:
-		return false;
-	}
-	return true;
-}
-
-
 //////////////////////////
 inline bool InitializeComboHash(HWND hWnd) {
 	const wchar_t *hash[] = {
@@ -632,7 +610,6 @@ LRESULT NeonWindow::Filesum(const std::wstring & file)
 			FILE_ATTRIBUTE_NORMAL,
 			nullptr);
 		if (hFile == INVALID_HANDLE_VALUE) {
-			FilesumInvoke(kFilesumBroken, 0, L"Invalid handle value");
 			return false;
 		}
 		BYTE buffer[65536];
@@ -653,6 +630,7 @@ LRESULT NeonWindow::Filesum(const std::wstring & file)
 		sizetext.assign(std::to_wstring(li.QuadPart));
 		DWORD dwRead;
 		int64_t cmsize = 0;
+		uint32_t pg = 0;
 		for (;;) {
 			if (!ReadFile(hFile, buffer, sizeof(buffer), &dwRead, nullptr)) {
 				break;
@@ -660,10 +638,11 @@ LRESULT NeonWindow::Filesum(const std::wstring & file)
 			sum->Update(buffer, dwRead);
 			cmsize += dwRead;
 			auto N = cmsize * 100 / li.QuadPart;
-			if (!FilesumInvoke(kFilesumProgress, (uint32_t)N, L""))
-			{
-				CloseHandle(hFile);
-				return false;
+			progress = (uint32_t)N;
+			/// when number is modify, Flush Window
+			if (pg != (uint32_t)N) {
+				pg = N;
+				InvalidateRect(nullptr);
 			}
 			if (dwRead<sizeof(buffer))
 				break;

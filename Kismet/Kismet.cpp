@@ -48,7 +48,7 @@ public:
 
 std::wstring PathCombineWithExe(const std::wstring &file) {
 	std::wstring path(PATHCCH_MAX_CCH, L'\0');
-	auto N=GetModuleFileNameW(nullptr, &path[0], path.size());
+	auto N=GetModuleFileNameW(nullptr, &path[0], (DWORD)path.size());
 	path.resize(N);
 	auto buf = &path[0];
 	if (!PathRemoveFileSpecW(buf)) {

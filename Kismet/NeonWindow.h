@@ -155,7 +155,6 @@ public:
 	LRESULT OnTheme(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnAbout(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnCopy(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
-	bool FilesumInvoke(std::int32_t state, std::uint32_t progress_, std::wstring data);
 };
 
 #endif
