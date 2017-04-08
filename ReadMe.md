@@ -33,4 +33,8 @@ You can use a color that fills the entire window
 
 ![theme](./docs/images/theme2.png)
 
+Change Title
+
+![title](./docs/images/title.png)
+
 WORKING IN PROGRESS

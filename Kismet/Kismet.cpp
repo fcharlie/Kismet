@@ -98,6 +98,11 @@ bool UpdateWindowSettings(NeonSettings &ns) {
 	if (N>1) {
 		ns.title.assign(buf,N);
 	}
+	N = GetPrivateProfileStringW(L"Window", L"Font", nullptr, buf, MAX_PATH, file.data());
+	if (N>1) {
+		ns.font.assign(buf, N);
+	}
+	//
 	N = GetPrivateProfileStringW(L"Color", L"Panel", nullptr, buf, MAX_PATH, file.data());
 	if (N>1) {
 		InitializeColorValue(buf,ns.panelcolor);

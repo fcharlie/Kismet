@@ -22,7 +22,8 @@ struct NeonSettings {
 	std::uint32_t contentcolor{ 0xffffff };
 	std::uint32_t textcolor{ 0x000000 };
 	std::uint32_t labelcolor{ 0x000000 };
-	std::wstring title;
+	std::wstring title{ L"Kismet Immersive" };
+	std::wstring font{ L"Segoe UI" };
 };
 
 bool ApplyWindowSettings(NeonSettings &ns);

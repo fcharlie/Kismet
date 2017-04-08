@@ -67,10 +67,7 @@ LRESULT NeonWindow::InitializeWindow()
 		return S_FALSE;
 	}
 	HRESULT  hr = E_FAIL;
-	RECT layout = { 100, 100,800, 470 };
-	if (ns.title.empty()) {
-		ns.title.assign(L"Kismet Immersive");
-	}
+	RECT layout = { CW_USEDEFAULT, CW_USEDEFAULT,CW_USEDEFAULT+ 700, CW_USEDEFAULT+ 370 };
 	width = 700;
 	height = 370;
 	areaheight = 250;
@@ -90,7 +87,7 @@ HRESULT NeonWindow::CreateDeviceIndependentResources() {
 			reinterpret_cast<IUnknown**>(&pWriteFactory));
 		if (SUCCEEDED(hr)) {
 			hr = pWriteFactory->CreateTextFormat(
-				L"Segoe UI",
+				ns.font.c_str(),
 				NULL,
 				DWRITE_FONT_WEIGHT_NORMAL,
 				DWRITE_FONT_STYLE_NORMAL,
@@ -106,7 +103,10 @@ HRESULT NeonWindow::CreateDeviceIndependentResources() {
 HRESULT NeonWindow::Initialize() {
 	auto hr = CreateDeviceIndependentResources();
 	//FLOAT dpiX, dpiY;
-	pFactory->GetDesktopDpi(&dpiX, &dpiY);
+	if (hr == S_OK) {
+		pFactory->ReloadSystemMetrics();
+		pFactory->GetDesktopDpi(&dpiX, &dpiY);
+	}
 	return hr;
 }
 HRESULT NeonWindow::CreateDeviceResources() {
@@ -410,7 +410,7 @@ inline bool HashsumAlgmCheck(int i, FilesumAlgw &aw) {
 /// combobox style
 #define KWS_COMBOBOX WS_CHILDWINDOW | WS_CLIPSIBLINGS | WS_VISIBLE | WS_TABSTOP | \
 CBS_DROPDOWNLIST  | CBS_HASSTRINGS 
-
+#define DEFAULT_PADDING96    20
 LRESULT NeonWindow::OnCreate(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL & bHandle)
 {
 	HICON hIcon = LoadIconW(GetModuleHandleW(nullptr), MAKEINTRESOURCEW(IDI_KISMET));
@@ -424,10 +424,12 @@ LRESULT NeonWindow::OnCreate(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL & bHa
 	GetObjectW(hFont, sizeof(logFont), &logFont);
 	DeleteObject(hFont);
 	hFont = NULL;
-
-	logFont.lfHeight = 20;
+	auto dpi = GetDpiForWindow(m_hWnd);
+	
+	logFont.lfHeight = MulDiv(DEFAULT_PADDING96, dpi, 96);
 	logFont.lfWeight = FW_NORMAL;
 	wcscpy_s(logFont.lfFaceName, L"Segoe UI");
+	
 	hFont = CreateFontIndirectW(&logFont);
 	auto LambdaCreateWindow = [&](LPCWSTR lpClassName, LPCWSTR lpWindowName, DWORD dwStyle,
 		int X, int Y, int nWidth, int nHeight, HMENU hMenu)->HWND {
