@@ -572,7 +572,7 @@ LRESULT NeonWindow::OnContentClear(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOO
 		showerror = false;
 		progress = 0;
 		UpdateTitle(L"");
-		InvalidateRect(nullptr, false);
+		InvalidateRect(nullptr,FALSE);
 	}
 	return S_OK;
 }
@@ -593,7 +593,6 @@ LRESULT NeonWindow::Filesum(const std::wstring & file)
 	filetext.clear();
 	hash.clear();
 	sizetext.clear();
-	//InvalidateRect(nullptr);
 	std::wstring title;
 	title.append(L"(").append(aw.name).append(L") ").append(PathFindFileNameW(file.data()));
 	UpdateTitle(title);
@@ -632,6 +631,7 @@ LRESULT NeonWindow::Filesum(const std::wstring & file)
 			filetext = file;
 		}
 		sizetext.assign(std::to_wstring(li.QuadPart));
+		InvalidateRect(nullptr);
 		DWORD dwRead;
 		int64_t cmsize = 0;
 		uint32_t pg = 0;
@@ -646,7 +646,7 @@ LRESULT NeonWindow::Filesum(const std::wstring & file)
 			/// when number is modify, Flush Window
 			if (pg != N) {
 				pg = (uint32_t)N;
-				InvalidateRect(nullptr);
+				InvalidateRect(nullptr,FALSE);
 			}
 			if (dwRead<AllocSingle::kInternalBufferSize)
 				break;
@@ -660,7 +660,7 @@ LRESULT NeonWindow::Filesum(const std::wstring & file)
 		if (!result) {
 			showerror = true;
 		}
-		//InvalidateRect(nullptr);
+		InvalidateRect(nullptr,FALSE);
 		locked = false;
 	});
 	return S_OK;

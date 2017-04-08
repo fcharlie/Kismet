@@ -14,6 +14,38 @@
 //#include "Securehash.h"
 #include "Kismet.h"
 
+class Buffer {
+protected:
+	void destroy(LPVOID mem) {
+		if (mem) {
+			HeapFree(GetProcessHeap(), 0, mem);
+		}
+	}
+public:
+	Buffer(const Buffer &) = delete;
+	Buffer &operator=(const Buffer &) = delete;
+	Buffer(size_t N) {
+		data_ = HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, N);
+	}
+	Buffer(Buffer &&other) {
+		destroy(data_);
+		data_ = other.data_;
+		size_ = other.size_;
+		other.data_ = nullptr;
+		other.size_ = 0;
+	}
+	template<class T>
+	T *Pointer() {
+		return reinterpret_cast<T*>(data_);
+	}
+	size_t size()const {
+		return size_;
+	}
+private:
+	void *data_{ nullptr };
+	size_t size_{ 0 };
+};
+
 
 class AllocSingle {
 public:
@@ -25,7 +57,7 @@ public:
 	AllocSingle() = default;
 	~AllocSingle() {
 		if (data) {
-			HeapFree(GetProcessHeap(), HEAP_ZERO_MEMORY, data);
+			HeapFree(GetProcessHeap(), 0, data);
 		}
 	}
 	template<typename T>
@@ -141,7 +173,7 @@ private:
 	std::uint32_t height;
 	std::uint32_t width;
 	std::uint32_t areaheight;
-	std::uint32_t keywidth{ 100 };
+	std::uint32_t keywidth{ 90 };
 	std::uint32_t lineheight{20};
 	bool showerror{ false };
 
