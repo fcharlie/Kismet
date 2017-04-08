@@ -126,7 +126,9 @@ int NeonWindowLoop()
 	NeonWindow window;
 	MSG msg;
 	UpdateWindowSettings(window.Settings());
-	window.InitializeWindow();
+	if (window.InitializeWindow() != S_OK) {
+		return 1;
+	}
 	window.ShowWindow(SW_SHOW);
 	window.UpdateWindow();
 	while (GetMessage(&msg, nullptr, 0, 0)>0) {

@@ -104,6 +104,8 @@ private:
 	std::wstring hash;
 	std::atomic_uint32_t progress{ 0 };
 	std::atomic_bool locked{ false };
+	float dpiX;
+	float dpiY;
 	std::uint32_t height;
 	std::uint32_t width;
 	std::uint32_t areaheight;

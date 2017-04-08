@@ -60,6 +60,12 @@ NeonWindow::~NeonWindow()
 
 LRESULT NeonWindow::InitializeWindow()
 {
+	/// create D2D1
+	if (Initialize() != S_OK) {
+		::MessageBoxW(nullptr, L"Initialize() failed", L"Fatal error", MB_OK | MB_ICONSTOP);
+		std::terminate();
+		return S_FALSE;
+	}
 	HRESULT  hr = E_FAIL;
 	RECT layout = { 100, 100,800, 470 };
 	if (ns.title.empty()) {
@@ -99,7 +105,7 @@ HRESULT NeonWindow::CreateDeviceIndependentResources() {
 }
 HRESULT NeonWindow::Initialize() {
 	auto hr = CreateDeviceIndependentResources();
-	FLOAT dpiX, dpiY;
+	//FLOAT dpiX, dpiY;
 	pFactory->GetDesktopDpi(&dpiX, &dpiY);
 	return hr;
 }
@@ -407,12 +413,6 @@ CBS_DROPDOWNLIST  | CBS_HASSTRINGS
 
 LRESULT NeonWindow::OnCreate(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL & bHandle)
 {
-	auto hr = Initialize();
-	if (hr != S_OK) {
-		::MessageBoxW(nullptr, L"Initialize() failed", L"Fatal error", MB_OK | MB_ICONSTOP);
-		std::terminate();
-		return S_FALSE;
-	}
 	HICON hIcon = LoadIconW(GetModuleHandleW(nullptr), MAKEINTRESOURCEW(IDI_KISMET));
 	SetIcon(hIcon, TRUE);
 	ChangeWindowMessageFilter(WM_DROPFILES, MSGFLT_ADD);
@@ -606,7 +606,6 @@ LRESULT NeonWindow::Filesum(const std::wstring & file)
 		return S_FALSE;
 	}
 	FilesumAlgw aw;
-	bool ucase = (Button_GetCheck(hCheck) == BST_CHECKED);
 	if (!HashsumAlgmCheck(ComboBox_GetCurSel(hCombo), aw)) {
 		return false;
 	}
@@ -618,7 +617,7 @@ LRESULT NeonWindow::Filesum(const std::wstring & file)
 	title.append(L"(").append(aw.name).append(L") ").append(PathFindFileNameW(file.data()));
 	UpdateTitle(title);
 	showerror = false;
-	Concurrency::create_task([this, file,aw,ucase]()->bool {
+	Concurrency::create_task([this, file,aw]()->bool {
 		std::shared_ptr<Hashsum> sum(CreateHashsum(file, aw.alm, aw.width));
 		if (!sum) {
 			return false;
@@ -669,6 +668,7 @@ LRESULT NeonWindow::Filesum(const std::wstring & file)
 		}
 		CloseHandle(hFile);
 		hash.clear();
+		bool ucase = (Button_GetCheck(hCheck) == BST_CHECKED);
 		sum->Final(ucase, hash);
 		return true;
 	}).then([this](bool result) {
