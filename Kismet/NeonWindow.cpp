@@ -455,7 +455,7 @@ LRESULT NeonWindow::OnCreate(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL & bHa
 	hBrush = CreateSolidBrush(calcLuminance(ns.panelcolor));
 	HMENU hSystemMenu = ::GetSystemMenu(m_hWnd, FALSE);
 	InsertMenuW(hSystemMenu, SC_CLOSE, MF_ENABLED, IDM_CHANGE_THEME, L"Change Panel Color");
-	InsertMenuW(hSystemMenu, SC_CLOSE, MF_ENABLED, IDM_KISMET_INFO, L"About Kismet Immersive\tAlt+F1");
+	InsertMenuW(hSystemMenu, SC_CLOSE, MF_ENABLED, IDM_APP_INFO, L"About Kismet Immersive\tAlt+F1");
 	return S_OK;
 }
 
@@ -549,17 +549,38 @@ LRESULT NeonWindow::OnRButtonUp(UINT, WPARAM wParam, LPARAM lParam, BOOL & bHand
 		//// NOT Area
 		return S_OK;
 	}
-	HMENU hMenu = ::LoadMenuW(GetModuleHandle(nullptr), MAKEINTRESOURCEW(IDM_KISMET_CONTEXT));
+	HMENU hMenu = ::LoadMenuW(GetModuleHandle(nullptr), MAKEINTRESOURCEW(IDM_MAIN_CONTEXT));
 	HMENU hPopu = GetSubMenu(hMenu, 0);
+	auto resourceIcon2Bitmap = [](int id)->HBITMAP {
+		HICON icon = LoadIconW(HINST_THISCOMPONENT, MAKEINTRESOURCEW(id));
+		HDC hDc = ::GetDC(NULL);
+		HDC hMemDc = CreateCompatibleDC(hDc);
+		auto hBitmap = CreateCompatibleBitmap(hDc, 16, 16);
+		SelectObject(hMemDc, hBitmap);
+		HBRUSH hBrush = GetSysColorBrush(COLOR_MENU);
+		DrawIconEx(hMemDc, 0, 0, icon, 16,16, 0, hBrush, DI_NORMAL);
+		DeleteObject(hBrush);
+		DeleteDC(hMemDc);
+		::ReleaseDC(NULL, hDc);
+		DestroyIcon(icon);
+		return hBitmap;
+	};
+	HBITMAP hBitmap = nullptr;
 	if (hash.empty()) {
 		EnableMenuItem(hPopu, IDM_CONTEXT_COPY, MF_DISABLED);
-	}
-	else {
+	}else {
 		EnableMenuItem(hPopu, IDM_CONTEXT_COPY, MF_ENABLED);
+		hBitmap = resourceIcon2Bitmap(IDI_ICON_COPY);
+		if (hBitmap) {
+			SetMenuItemBitmaps(hPopu, IDM_CONTEXT_COPY, MF_BYCOMMAND, hBitmap, hBitmap);
+		}
 	}
 
 	::TrackPopupMenuEx(hPopu, TPM_RIGHTBUTTON, ptc.x, ptc.y, m_hWnd, nullptr);
-	::DestroyMenu(hPopu);
+	::DestroyMenu(hMenu);
+	if (hBitmap) {
+		DeleteObject(hBitmap);
+	}
 	return S_OK;
 }
 
@@ -681,7 +702,7 @@ LRESULT NeonWindow::OnDropfiles(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL & 
 LRESULT NeonWindow::OnOpenFile(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL & bHandled)
 {
 	std::wstring filename;
-	if (!KismetDiscoverWindow(m_hWnd, filename, L"Open File")) {
+	if (!OpenFileWindow(m_hWnd, filename, L"Open File")) {
 		return S_OK;
 	}
 	return Filesum(filename);

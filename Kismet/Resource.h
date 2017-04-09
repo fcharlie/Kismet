@@ -16,9 +16,15 @@
 #define IDI_KISMET			101
 #define IDI_ICON_APP     102
 #define IDI_ICON_PANTONE  103
+#define IDI_ICON_COPY   104
 
-#define IDM_KISMET_CONTEXT 110
-#define IDM_CONTEXT_COPY   111
-#define IDM_CONTEXT_COPYALL       112
+#define IDM_CHANGE_THEME 110
+#define IDM_APP_INFO 111
+
+#define IDM_MAIN_CONTEXT 120
+#define IDM_CONTEXT_COLOR      121
+#define IDM_CONTEXT_COPY   122
+
+
 
 

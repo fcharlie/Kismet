@@ -91,7 +91,7 @@ struct NeonSettings {
 
 bool ApplyWindowSettings(NeonSettings &ns);
 
-bool KismetDiscoverWindow(
+bool OpenFileWindow(
 	HWND hParent,
 	std::wstring &filename,
 	const wchar_t *pszWindowTitle);
@@ -200,7 +200,7 @@ public:
 		COMMAND_ID_HANDLER(IDC_FILEOPEN_BUTTON, OnOpenFile)
 		COMMAND_ID_HANDLER(IDM_CONTEXT_COPY,OnCopy)
 		SYSCOMMAND_ID_HANDLER(IDM_CHANGE_THEME,OnTheme)
-		SYSCOMMAND_ID_HANDLER(IDM_KISMET_INFO,OnAbout)
+		SYSCOMMAND_ID_HANDLER(IDM_APP_INFO,OnAbout)
 	END_MSG_MAP()
 	LRESULT OnCreate(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandle);
 	LRESULT OnDestroy(UINT nMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandle);

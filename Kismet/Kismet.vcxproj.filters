@@ -47,13 +47,13 @@
     <ClCompile Include="NeonWindow.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="KismetDiscover.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="MessageWindow.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Hashsum.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenFile.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
