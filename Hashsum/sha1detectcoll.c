@@ -4,6 +4,7 @@
 * See accompanying file LICENSE.txt or copy at
 * https://opensource.org/licenses/MIT
 ***/
+
 #include <string.h>
 #include <memory.h>
 #include <stdio.h>
@@ -15,18 +16,22 @@
 
 /* 
    Because Little-Endian architectures are most common,
-   we only set BIGENDIAN if one of these conditions is met.
+   we only set SHA1DC_BIGENDIAN if one of these conditions is met.
    Note that all MSFT platforms are little endian,
    so none of these will be defined under the MSC compiler.
    If you are compiling on a big endian platform and your compiler does not define one of these,
    you will have to add whatever macros your tool chain defines to indicate Big-Endianness.
  */
-#if (defined(__BYTE_ORDER) && (__BYTE_ORDER == __BIG_ENDIAN)) || \
+#ifdef SHA1DC_BIGENDIAN
+#undef SHA1DC_BIGENDIAN
+#endif
+#if (!defined SHA1DC_FORCE_LITTLEENDIAN) && \
+    ((defined(__BYTE_ORDER) && (__BYTE_ORDER == __BIG_ENDIAN)) || \
     (defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __BIG_ENDIAN__)) || \
-    defined(__BIG_ENDIAN__) || defined(__ARMEB__) || defined(__THUMBEB__) ||  defined(__AARCH64EB__) || \
-    defined(_MIPSEB) || defined(__MIPSEB) || defined(__MIPSEB__)
+    defined(_BIG_ENDIAN) || defined(__BIG_ENDIAN__) || defined(__ARMEB__) || defined(__THUMBEB__) ||  defined(__AARCH64EB__) || \
+    defined(_MIPSEB) || defined(__MIPSEB) || defined(__MIPSEB__) || defined(SHA1DC_FORCE_BIGENDIAN))
 
-#define BIGENDIAN	(1)
+#define SHA1DC_BIGENDIAN
 
 #endif /*ENDIANNESS SELECTION*/
 
@@ -38,11 +43,11 @@
 
 #define sha1_mix(W, t)  (rotate_left(W[t - 3] ^ W[t - 8] ^ W[t - 14] ^ W[t - 16], 1))
 
-#if defined(BIGENDIAN)
+#ifdef SHA1DC_BIGENDIAN
 	#define sha1_load(m, t, temp)  { temp = m[t]; }
 #else
 	#define sha1_load(m, t, temp)  { temp = m[t]; sha1_bswap32(temp); }
-#endif /*define(BIGENDIAN)*/
+#endif
 
 #define sha1_store(W, t, x)	*(volatile uint32_t *)&W[t] = x
 
@@ -871,6 +876,11 @@ static void sha1recompress_fast_ ## t (uint32_t ihvin[5], uint32_t ihvout[5], co
 	ihvout[0] = ihvin[0] + a; ihvout[1] = ihvin[1] + b; ihvout[2] = ihvin[2] + c; ihvout[3] = ihvin[3] + d; ihvout[4] = ihvin[4] + e; \
 }
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 4127)  /* Complier complains about the checks in the above macro being constant. */
+#endif
+
 #ifdef DOSTORESTATE0
 SHA1_RECOMPRESS(0)
 #endif
@@ -1189,6 +1199,10 @@ SHA1_RECOMPRESS(78)
 
 #ifdef DOSTORESTATE79
 SHA1_RECOMPRESS(79)
+#endif
+
+#ifdef _MSC_VER
+#pragma warning(pop)
 #endif
 
 static void sha1_recompression_step(uint32_t step, uint32_t ihvin[5], uint32_t ihvout[5], const uint32_t me2[80], const uint32_t state[5])
@@ -1730,7 +1744,8 @@ void SHA1DCUpdate(SHA1_CTX* ctx, const char* buf, size_t len)
 	while (len >= 64)
 	{
 		ctx->total += 64;
-		sha1_process(ctx, (uint32_t*)(buf));
+		memcpy(ctx->buffer, buf, 64);
+		sha1_process(ctx, (uint32_t*)(ctx->buffer));
 		buf += 64;
 		len -= 64;
 	}
