@@ -151,7 +151,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
-
 	DotComInitialize dot;
 	HeapSetInformation(NULL, HeapEnableTerminationOnCorruption, NULL, 0);
     return NeonWindowLoop();
