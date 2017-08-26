@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26228.9
+VisualStudioVersion = 15.0.26730.8
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Kismet", "Kismet\Kismet.vcxproj", "{B75C3EED-8D0B-4E2C-88BC-DEE0ED63DD8E}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Hashsum", "Hashsum\Hashsum.vcxproj", "{3492C5D3-64D7-4031-9991-7F3BCE5CFCB2}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Kisasum", "Kisasum\Kisasum.vcxproj", "{680C70DB-7391-44BA-8B11-029E4A135A56}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,8 +33,19 @@ Global
 		{3492C5D3-64D7-4031-9991-7F3BCE5CFCB2}.Release|x64.Build.0 = Release|x64
 		{3492C5D3-64D7-4031-9991-7F3BCE5CFCB2}.Release|x86.ActiveCfg = Release|Win32
 		{3492C5D3-64D7-4031-9991-7F3BCE5CFCB2}.Release|x86.Build.0 = Release|Win32
+		{680C70DB-7391-44BA-8B11-029E4A135A56}.Debug|x64.ActiveCfg = Debug|x64
+		{680C70DB-7391-44BA-8B11-029E4A135A56}.Debug|x64.Build.0 = Debug|x64
+		{680C70DB-7391-44BA-8B11-029E4A135A56}.Debug|x86.ActiveCfg = Debug|Win32
+		{680C70DB-7391-44BA-8B11-029E4A135A56}.Debug|x86.Build.0 = Debug|Win32
+		{680C70DB-7391-44BA-8B11-029E4A135A56}.Release|x64.ActiveCfg = Release|x64
+		{680C70DB-7391-44BA-8B11-029E4A135A56}.Release|x64.Build.0 = Release|x64
+		{680C70DB-7391-44BA-8B11-029E4A135A56}.Release|x86.ActiveCfg = Release|Win32
+		{680C70DB-7391-44BA-8B11-029E4A135A56}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D9FA760D-4BCB-43EF-8530-D8C792EE992B}
 	EndGlobalSection
 EndGlobal

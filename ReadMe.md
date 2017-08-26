@@ -1,6 +1,5 @@
 # Kismet File Hashsum
 
-
 ## None
 
 ![image](./docs/images/none.png)
@@ -38,3 +37,9 @@ Change Title
 ![title](./docs/images/title.png)
 
 WORKING IN PROGRESS
+
+## Kisasum cli hash utility
+
+Now. we provider a cli utility called `kisasum`, support create xml or json hash result.
+
+![Kisasum](./docs/images/kisasum.png)
