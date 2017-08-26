@@ -43,3 +43,12 @@ WORKING IN PROGRESS
 Now. we provider a cli utility called `kisasum`, support create xml or json hash result.
 
 ![Kisasum](./docs/images/kisasum.png)
+
+Powershell invoke Kisasum:
+
+```powershell
+ $hash=.\Kisasum.exe $FilePath --format=json -a sha3-256|ConvertFrom-JSON
+ foreach($f in $hash.files){
+   Write-Host "$($f.hash)    $($f.name)"
+ }
+```
