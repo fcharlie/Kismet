@@ -23,7 +23,7 @@
     <ProjectGuid>{3492C5D3-64D7-4031-9991-7F3BCE5CFCB2}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Hashsum</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
     <ProjectName>Hashsum</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
