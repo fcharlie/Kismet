@@ -747,7 +747,7 @@ LRESULT NeonWindow::OnAbout(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL & bHa
 	MessageWindowEx(
 		m_hWnd,
 		L"About Kismet utilities",
-		L"Prerelease: 1.0.0.0\nCopyright \xA9 2017, Force Charlie. All Rights Reserved.",
+		L"Prerelease: 1.0.0.0\nCopyright \xA9 2018, Force Charlie. All Rights Reserved.",
 		L"For more information about this tool.\nVisit: <a href=\"http://forcemz.net/\">forcemz.net</a>",
 		kAboutWindow);
 	return S_OK;

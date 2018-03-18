@@ -9,7 +9,7 @@
 #define PATCHVER 0
 #define BUILDVER 0
 
-#define COPYRIGHT L"Copyright \xA9 2017 Force Charlie .All Rights Reserved."
+#define COPYRIGHT L"Copyright \xA9 2018 Force Charlie .All Rights Reserved."
 
 
 
