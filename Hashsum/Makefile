@@ -1,214 +1,201 @@
 # Makefile for LibRHash
-CC      ?= gcc
-AR      ?= ar
-#NOTE: NDEBUG turns off asserts
-OPTFLAGS   = -O2 -DNDEBUG -fomit-frame-pointer -ffunction-sections -fdata-sections
-OPTLDFLAGS =
-CFLAGS     = $(OPTFLAGS)
-LDFLAGS    = $(OPTLDFLAGS)
-ADDCFLAGS  =
-LIBCFLAGS  =
-ADDLDFLAGS =
-DEFS    = -DIN_RHASH
-PRGCFLAGS  = -pipe $(DEFS) $(ADDCFLAGS) $(CFLAGS) \
-  -Wall -W -Wstrict-prototypes -Wnested-externs -Winline -Wpointer-arith \
-  -Wbad-function-cast -Wmissing-prototypes -Wmissing-declarations
-ALLCFLAGS = $(LIBCFLAGS) $(PRGCFLAGS)
-LDRHASH    = -L. -lrhash
-LIBLDFLAGS = $(LDFLAGS) $(ADDLDFLAGS)
-HEADERS = algorithms.h byte_order.h plug_openssl.h rhash.h rhash_timing.h rhash_torrent.h util.h aich.h crc32.h ed2k.h edonr.h hex.h md4.h md5.h sha1.h sha256.h sha512.h sha3.h ripemd-160.h gost.h has160.h snefru.h tiger.h              tth.h torrent.h whirlpool.h
-SOURCES = algorithms.c byte_order.c plug_openssl.c rhash.c rhash_timing.c rhash_torrent.c util.c aich.c crc32.c ed2k.c edonr.c hex.c md4.c md5.c sha1.c sha256.c sha512.c sha3.c ripemd-160.c gost.c has160.c snefru.c tiger.c tiger_sbox.c tth.c torrent.c whirlpool.c whirlpool_sbox.c
-OBJECTS = algorithms.o byte_order.o plug_openssl.o rhash.o rhash_timing.o rhash_torrent.o util.o aich.o crc32.o ed2k.o edonr.o hex.o md4.o md5.o sha1.o sha256.o sha512.o sha3.o ripemd-160.o gost.o has160.o snefru.o tiger.o tiger_sbox.o tth.o torrent.o whirlpool.o whirlpool_sbox.o
+
+include config.mak
+
+HEADERS = algorithms.h byte_order.h plug_openssl.h rhash.h rhash_timing.h rhash_torrent.h aich.h crc32.h ed2k.h edonr.h hex.h md4.h md5.h sha1.h sha256.h sha512.h sha3.h ripemd-160.h gost.h has160.h snefru.h tiger.h tth.h torrent.h ustd.h util.h whirlpool.h
+SOURCES = algorithms.c byte_order.c plug_openssl.c rhash.c rhash_timing.c rhash_torrent.c aich.c crc32.c ed2k.c edonr.c hex.c md4.c md5.c sha1.c sha256.c sha512.c sha3.c ripemd-160.c gost.c has160.c snefru.c tiger.c tiger_sbox.c tth.c torrent.c whirlpool.c whirlpool_sbox.c
+OBJECTS = algorithms.o byte_order.o plug_openssl.o rhash.o rhash_timing.o rhash_torrent.o aich.o crc32.o ed2k.o edonr.o hex.o md4.o md5.o sha1.o sha256.o sha512.o sha3.o ripemd-160.o gost.o has160.o snefru.o tiger.o tiger_sbox.o tth.o torrent.o whirlpool.o whirlpool_sbox.o
 LIB_HEADERS = rhash.h rhash_torrent.h
-LEGACY_LIB_HEADERS = rhash_timing.h
-SO_HEADERS = $(LIB_HEADERS) $(LEGACY_LIB_HEADERS)
-# installation directories and names
-DESTDIR =
-PREFIX  ?= /usr/local
-INCDIR  = $(PREFIX)/include
-LIBDIR  = $(PREFIX)/lib
-LIBRARY = librhash.a
-SONAME  = librhash.so.0
-SOLINK  = librhash.so
-TEST_TARGET = test_hashes
-TEST_SHARED = test_shared
-# Set variables according to GNU coding standard
-INSTALL = install
+SO_HEADERS = $(LIB_HEADERS) $(LEGACY_HEADERS)
+TEST_STATIC = test_static$(EXEC_EXT)
+TEST_SHARED = test_shared$(EXEC_EXT)
 INSTALL_DATA    = $(INSTALL) -m 644
 INSTALL_SHARED  = $(INSTALL) -m 644
 
-all: $(LIBRARY)
-lib-static: $(LIBRARY)
-lib-shared: $(SONAME)
+all: $(BUILD_TARGETS)
+lib-static: $(LIBRHASH_STATIC)
+lib-shared: $(LIBRHASH_SHARED)
 libs-all: lib-static lib-shared
-dist-clean: clean
+uninstall-lib: uninstall-lib-shared uninstall-lib-static uninstall-so-link
 
-install-lib-static: $(LIBRARY) install-headers
-	$(INSTALL) -d $(DESTDIR)$(LIBDIR)
-	$(INSTALL_DATA) $(LIBRARY) $(DESTDIR)$(LIBDIR)/
+config.mak:
+	echo "Run the ./configure script first" && false
 
-install-lib-shared: $(SONAME)
-	$(INSTALL) -d $(DESTDIR)$(LIBDIR)
-	$(INSTALL_SHARED) $(SONAME) $(DESTDIR)$(LIBDIR)/
+install-lib-static: $(LIBRHASH_STATIC) install-headers
+	$(INSTALL) -d $(LIBDIR)
+	$(INSTALL_DATA) $(LIBRHASH_STATIC) $(LIBDIR)/
+
+install-lib-shared: $(LIBRHASH_SHARED) $(EXTRA_INSTALL_LIBSHARED)
+	$(INSTALL) -d $(SO_DIR)
+	$(INSTALL_SHARED) $(LIBRHASH_SHARED) $(SO_DIR)/
+
+install-implib:
+	$(INSTALL) -d $(LIBDIR)
+	$(INSTALL_SHARED) $(LIBRHASH_IMPLIB) $(LIBDIR)/
 
 install-so-link:
-	$(INSTALL) -d $(DESTDIR)$(LIBDIR)
-	ln -s $(SONAME) $(DESTDIR)$(LIBDIR)/$(SOLINK)
+	$(INSTALL) -d $(LIBDIR)
+	ln -s $(LIBRHASH_SHARED) $(LIBDIR)/$(LIBRHASH_SOLINK)
 
 uninstall-lib-static: uninstall-headers
-	rm -f $(DESTDIR)$(LIBDIR)/$(LIBRARY)
+	rm -f $(LIBDIR)/$(LIBRHASH_STATIC)
 
-uninstall-lib-shared:
-	rm -f $(DESTDIR)$(LIBDIR)/$(SONAME)
+uninstall-lib-shared: $(EXTRA_UNINSTALL_LIBSHARED)
+	rm -f $(LIBDIR)/$(LIBRHASH_SHARED)
+
+uninstall-implib:
+	rm -f $(LIBDIR)/$(IMPLIBNAME)
 
 uninstall-so-link:
-	rm -f $(DESTDIR)$(LIBDIR)/$(SOLINK)
+	rm -f $(LIBDIR)/$(LIBRHASH_SOLINK)
 
 install-headers:
-	$(INSTALL) -d $(DESTDIR)$(INCDIR)
-	$(INSTALL_DATA) $(LIB_HEADERS) $(DESTDIR)$(INCDIR)/
+	$(INSTALL) -d $(INCDIR)
+	$(INSTALL_DATA) $(LIB_HEADERS) $(INCDIR)/
 
 uninstall-headers:
-	for f in $(LIB_HEADERS); do rm -f "$(DESTDIR)$(INCDIR)/$$f"; done
+	for f in $(LIB_HEADERS); do rm -f "$(INCDIR)/$$f"; done
 
 # not using GNU make extensions for compatibility with Unix/*BSD make
 #%.o: %.c
-#	$(CC) -c $(ALLCFLAGS) $< -o $@
+#	$(CC) -c $(CFLAGS) $< -o $@
 
-# NOTE: dependences were generated by 'gcc -MM -DIN_RHASH -DUSE_OPENSSL *.c'
+# NOTE: dependences were generated by 'gcc -MM -DUSE_OPENSSL *.c'
 # we are using plain old makefile style to support BSD make
-aich.o: aich.c byte_order.h ustd.h config.h algorithms.h rhash.h aich.h \
- sha1.h
-	$(CC) -c $(ALLCFLAGS) $< -o $@
+aich.o: aich.c byte_order.h ustd.h algorithms.h rhash.h aich.h sha1.h
+	$(CC) -c $(CFLAGS) $< -o $@
 
-algorithms.o: algorithms.c byte_order.h ustd.h config.h rhash.h \
- algorithms.h aich.h sha1.h crc32.h ed2k.h md4.h edonr.h gost.h has160.h \
- md5.h ripemd-160.h snefru.h sha256.h sha512.h sha3.h tiger.h torrent.h \
- tth.h whirlpool.h
-	$(CC) -c $(ALLCFLAGS) $< -o $@
+algorithms.o: algorithms.c byte_order.h ustd.h rhash.h algorithms.h \
+ aich.h sha1.h crc32.h ed2k.h md4.h edonr.h gost.h has160.h md5.h \
+ ripemd-160.h snefru.h sha256.h sha512.h sha3.h tiger.h torrent.h tth.h \
+ whirlpool.h
+	$(CC) -c $(CFLAGS) $< -o $@
 
-byte_order.o: byte_order.c byte_order.h ustd.h config.h
-	$(CC) -c $(ALLCFLAGS) $< -o $@
+byte_order.o: byte_order.c byte_order.h ustd.h
+	$(CC) -c $(CFLAGS) $< -o $@
 
-crc32.o: crc32.c byte_order.h ustd.h config.h crc32.h
-	$(CC) -c $(ALLCFLAGS) $< -o $@
+crc32.o: crc32.c byte_order.h ustd.h crc32.h
+	$(CC) -c $(CFLAGS) $< -o $@
 
 ed2k.o: ed2k.c ed2k.h md4.h ustd.h
-	$(CC) -c $(ALLCFLAGS) $< -o $@
+	$(CC) -c $(CFLAGS) $< -o $@
 
-edonr.o: edonr.c byte_order.h ustd.h config.h edonr.h
-	$(CC) -c $(ALLCFLAGS) $< -o $@
+edonr.o: edonr.c byte_order.h ustd.h edonr.h
+	$(CC) -c $(CFLAGS) $< -o $@
 
-gost.o: gost.c byte_order.h ustd.h config.h gost.h
-	$(CC) -c $(ALLCFLAGS) $< -o $@
+gost.o: gost.c byte_order.h ustd.h gost.h
+	$(CC) -c $(CFLAGS) $< -o $@
 
-has160.o: has160.c byte_order.h ustd.h config.h has160.h
-	$(CC) -c $(ALLCFLAGS) $< -o $@
+has160.o: has160.c byte_order.h ustd.h has160.h
+	$(CC) -c $(CFLAGS) $< -o $@
 
 hex.o: hex.c hex.h ustd.h
-	$(CC) -c $(ALLCFLAGS) $< -o $@
+	$(CC) -c $(CFLAGS) $< -o $@
 
-md4.o: md4.c byte_order.h ustd.h config.h md4.h
-	$(CC) -c $(ALLCFLAGS) $< -o $@
+md4.o: md4.c byte_order.h ustd.h md4.h
+	$(CC) -c $(CFLAGS) $< -o $@
 
-md5.o: md5.c byte_order.h ustd.h config.h md5.h
-	$(CC) -c $(ALLCFLAGS) $< -o $@
+md5.o: md5.c byte_order.h ustd.h md5.h
+	$(CC) -c $(CFLAGS) $< -o $@
 
 plug_openssl.o: plug_openssl.c algorithms.h rhash.h byte_order.h ustd.h \
- config.h plug_openssl.h
-	$(CC) -c $(ALLCFLAGS) $< -o $@
+ plug_openssl.h
+	$(CC) -c $(CFLAGS) $< -o $@
 
-rhash.o: rhash.c byte_order.h ustd.h config.h algorithms.h rhash.h \
- torrent.h sha1.h plug_openssl.h util.h hex.h
-	$(CC) -c $(ALLCFLAGS) $< -o $@
+rhash.o: rhash.c byte_order.h ustd.h algorithms.h rhash.h torrent.h \
+ sha1.h plug_openssl.h util.h hex.h
+	$(CC) -c $(CFLAGS) $< -o $@
 
-rhash_timing.o: rhash_timing.c byte_order.h ustd.h config.h rhash.h \
- rhash_timing.h
-	$(CC) -c $(ALLCFLAGS) $< -o $@
+rhash_timing.o: rhash_timing.c byte_order.h ustd.h rhash.h rhash_timing.h
+	$(CC) -c $(CFLAGS) $< -o $@
 
 rhash_torrent.o: rhash_torrent.c algorithms.h rhash.h byte_order.h ustd.h \
- config.h torrent.h sha1.h rhash_torrent.h
-	$(CC) -c $(ALLCFLAGS) $< -o $@
+ torrent.h sha1.h rhash_torrent.h
+	$(CC) -c $(CFLAGS) $< -o $@
 
-ripemd-160.o: ripemd-160.c byte_order.h ustd.h config.h ripemd-160.h
-	$(CC) -c $(ALLCFLAGS) $< -o $@
+ripemd-160.o: ripemd-160.c byte_order.h ustd.h ripemd-160.h
+	$(CC) -c $(CFLAGS) $< -o $@
 
-sha1.o: sha1.c byte_order.h ustd.h config.h sha1.h
-	$(CC) -c $(ALLCFLAGS) $< -o $@
+sha1.o: sha1.c byte_order.h ustd.h sha1.h
+	$(CC) -c $(CFLAGS) $< -o $@
 
-sha256.o: sha256.c byte_order.h ustd.h config.h sha256.h
-	$(CC) -c $(ALLCFLAGS) $< -o $@
+sha256.o: sha256.c byte_order.h ustd.h sha256.h
+	$(CC) -c $(CFLAGS) $< -o $@
 
-sha512.o: sha512.c byte_order.h ustd.h config.h sha512.h
-	$(CC) -c $(ALLCFLAGS) $< -o $@
+sha3.o: sha3.c byte_order.h ustd.h sha3.h
+	$(CC) -c $(CFLAGS) $< -o $@
 
-sha3.o: sha3.c byte_order.h ustd.h config.h sha3.h
-	$(CC) -c $(ALLCFLAGS) $< -o $@
+sha512.o: sha512.c byte_order.h ustd.h sha512.h
+	$(CC) -c $(CFLAGS) $< -o $@
 
-snefru.o: snefru.c byte_order.h ustd.h config.h snefru.h
-	$(CC) -c $(ALLCFLAGS) $< -o $@
+snefru.o: snefru.c byte_order.h ustd.h snefru.h
+	$(CC) -c $(CFLAGS) $< -o $@
 
-test_hashes.o: test_hashes.c byte_order.h ustd.h config.h rhash_timing.h \
+test_hashes.o: test_hashes.c byte_order.h ustd.h rhash_timing.h \
  rhash_torrent.h rhash.h test_hashes.h
-	$(CC) -c $(ALLCFLAGS) $< -o $@
+	$(CC) -c $(CFLAGS) $< -o $@
 
-tiger.o: tiger.c byte_order.h ustd.h config.h tiger.h
-	$(CC) -c $(ALLCFLAGS) $< -o $@
+tiger.o: tiger.c byte_order.h ustd.h tiger.h
+	$(CC) -c $(CFLAGS) $< -o $@
 
-tiger_sbox.o: tiger_sbox.c byte_order.h ustd.h config.h
-	$(CC) -c $(ALLCFLAGS) $< -o $@
+tiger_sbox.o: tiger_sbox.c byte_order.h ustd.h
+	$(CC) -c $(CFLAGS) $< -o $@
 
-torrent.o: torrent.c byte_order.h ustd.h config.h algorithms.h rhash.h \
- hex.h torrent.h sha1.h
-	$(CC) -c $(ALLCFLAGS) $< -o $@
+torrent.o: torrent.c byte_order.h ustd.h algorithms.h rhash.h hex.h \
+ torrent.h sha1.h
+	$(CC) -c $(CFLAGS) $< -o $@
 
-tth.o: tth.c byte_order.h ustd.h config.h tth.h tiger.h
-	$(CC) -c $(ALLCFLAGS) $< -o $@
+tth.o: tth.c byte_order.h ustd.h tth.h tiger.h
+	$(CC) -c $(CFLAGS) $< -o $@
 
-util.o: util.c util.h
-	$(CC) -c $(ALLCFLAGS) $< -o $@
+whirlpool.o: whirlpool.c byte_order.h ustd.h whirlpool.h
+	$(CC) -c $(CFLAGS) $< -o $@
 
-whirlpool.o: whirlpool.c byte_order.h ustd.h config.h whirlpool.h
-	$(CC) -c $(ALLCFLAGS) $< -o $@
+whirlpool_sbox.o: whirlpool_sbox.c byte_order.h ustd.h
+	$(CC) -c $(CFLAGS) $< -o $@
 
-whirlpool_sbox.o: whirlpool_sbox.c byte_order.h ustd.h config.h
-	$(CC) -c $(ALLCFLAGS) $< -o $@
+# build shared library
+$(EXPORTS_FILE): $(SO_HEADERS)
+	sed -ne '1s/.*/{ global:/p; s/^RHASH_API.* \(rhash_[a-z0-9_]*\)(.*/  \1;/p; $$s/.*/local: *; };/p' $(SO_HEADERS) > $@
 
-# MINGW dll target
-DLLNAME = librhash.dll
+$(LIBRHASH_SOLINK):
+	rm -f $(LIBRHASH_SOLINK)
+	ln -s $(LIBRHASH_SHARED) $(LIBRHASH_SOLINK)
 
-dll: $(DLLNAME)
-$(DLLNAME): $(SOURCES)
-	sed -n '1s/.*/{ global:/p; s/^RHASH_API.* \([a-z0-9_]\+\)(.*/  \1;/p; $$s/.*/local: *; };/p' $(LIB_HEADERS) > exports.sym
-	$(CC) -DRHASH_EXPORTS $(ALLCFLAGS) -shared $(SOURCES) -Wl,--version-script,exports.sym,--output-def,librhash.def,-soname,$@ $(LIBLDFLAGS) -o $@
+$(LIBRHASH_SHARED): $(SOURCES) $(EXPORTS_TARGET) $(SOLINK_TARGET)
+	$(CC) $(SHARED_CFLAGS) $(SOURCES) $(SHARED_LDFLAGS) -o $@
 
-test-dll: $(DLLNAME) test_hashes.o
-	$(CC) $(PRGCFLAGS) test_hashes.o $(DLLNAME) -o $(TEST_SHARED) && ./$(TEST_SHARED)
-
-# shared and static libraries
-$(SONAME): $(SOURCES)
-	sed -n '1s/.*/{ global:/p; s/^RHASH_API.* \([a-z0-9_]\+\)(.*/  \1;/p; $$s/.*/local: *; };/p' $(SO_HEADERS) > exports.sym
-	$(CC) -fpic $(ALLCFLAGS) -shared $(SOURCES) -Wl,--version-script,exports.sym,-soname,$(SONAME) $(LIBLDFLAGS) -o $@
-	ln -s $(SONAME) $(SOLINK)
-# use 'nm -Cg --defined-only $@' to view exported symbols
-
-$(LIBRARY): $(OBJECTS)
+# build static library
+$(LIBRHASH_STATIC): $(OBJECTS)
 	$(AR) cqs $@ $(OBJECTS)
-#	$(AR) cr $(LIBRARY) $(OBJECTS) && runlib $(LIBRARY)
 
-$(TEST_TARGET): $(LIBRARY) test_hashes.o
-	$(CC) $(ALLCFLAGS) test_hashes.o $(LIBRARY) $(LIBLDFLAGS) -o $@
+# test targets
+$(TEST_SHARED): $(LIBRHASH_SHARED) test_hashes.o
+	$(CC) $(CFLAGS) test_hashes.o $(LIBRHASH_SHARED) $(LDFLAGS) -o $@
 
-test-shared: $(SONAME) test_hashes.o
-	$(CC) $(PRGCFLAGS) test_hashes.o $(SONAME) $(LIBLDFLAGS) -o $(TEST_SHARED)
-	LD_LIBRARY_PATH=.:$(LD_LIBRARY_PATH) ./$(TEST_SHARED)
+$(TEST_STATIC): $(LIBRHASH_STATIC) test_hashes.o
+	$(CC) $(CFLAGS) test_hashes.o $(LIBRHASH_STATIC) $(BIN_STATIC_LDFLAGS) -o $@
 
-test-static: $(TEST_TARGET)
-	./$(TEST_TARGET)
+test: $(TEST_TARGETS)
+test-static: $(TEST_STATIC)
+	./$(TEST_STATIC)
+test-shared: $(TEST_SHARED)
+	LD_LIBRARY_PATH=.:$(LD_LIBRARY_PATH) DYLD_LIBRARY_PATH=.:$(DYLD_LIBRARY_PATH) ./$(TEST_SHARED)
 
-test: test-static
-	if [ -f $(SONAME) ]; then make test-shared; fi
-#	if [ -f $(DLLNAME) ]; then make test-dll; fi
+print-info: print-info-$(BUILD_TYPE)
+print-info-static: $(TEST_STATIC)
+	./$(TEST_STATIC) --info
+print-info-shared: $(TEST_SHARED)
+	LD_LIBRARY_PATH=.:$(LD_LIBRARY_PATH) DYLD_LIBRARY_PATH=.:$(DYLD_LIBRARY_PATH) ./$(TEST_SHARED) --info
+
+distclean: clean
+	rm -f config.mak
 
 clean:
-	rm -f *.o $(LIBRARY) $(TEST_TARGET) $(TEST_SHARED) $(SONAME) $(SOLINK) exports.sym $(DLLNAME) librhash.def
+	rm -f *.o $(LIBRHASH_STATIC) $(LIBRHASH_SHARED) $(TEST_STATIC) $(TEST_SHARED) $(RM_FILES)
+
+.PHONY: all clean distclean install-headers install-lib-shared install-lib-static \
+	install-so-link libs-all lib-shared lib-static test test-shared test-static \
+	print-info print-info-static print-info-shared uninstall-headers \
+	uninstall-lib uninstall-lib-shared uninstall-lib-static uninstall-so-link \
+	install-implib uninstall-implib
