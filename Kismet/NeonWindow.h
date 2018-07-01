@@ -2,16 +2,16 @@
 #define NEONWINDOW_H
 #pragma once
 #include <atlbase.h>
-#include <atlwin.h>
 #include <atlctl.h>
+#include <atlwin.h>
+#include <atomic>
 #include <d2d1.h>
 #include <d2d1helper.h>
 #include <dwrite.h>
-#include <wincodec.h>
-#include <vector>
-#include <string>
-#include <atomic>
 #include <memory>
+#include <string>
+#include <vector>
+#include <wincodec.h>
 //#include "Securehash.h"
 #include "Kismet.h"
 
@@ -116,8 +116,7 @@ struct D2D1Checkbox {
 #endif
 
 #define NEON_WINDOW_CLASSSTYLE                                                 \
-  WS_OVERLAPPED | WS_SYSMENU | \
-WS_MINIMIZEBOX | WS_CLIPCHILDREN |                          \
+  WS_OVERLAPPED | WS_SYSMENU | WS_MINIMIZEBOX | WS_CLIPCHILDREN |              \
       WS_CLIPSIBLINGS & ~WS_MAXIMIZEBOX
 typedef CWinTraits<NEON_WINDOW_CLASSSTYLE, WS_EX_APPWINDOW | WS_EX_WINDOWEDGE>
     CMetroWindowTraits;

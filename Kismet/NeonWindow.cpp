@@ -1,21 +1,23 @@
 #include "stdafx.h"
-#include <cstdlib>
-#include <cctype>
-#include <algorithm>
-#include <Prsht.h>
-#include <CommCtrl.h>
-#include <Shlwapi.h>
-#include <Shellapi.h>
-#include <PathCch.h>
-#include <Windowsx.h>
-#include <Mmsystem.h>
-#include <commdlg.h>
-#include <ppltasks.h>
-#include <ShellScalingApi.h>
-#include "Kismet.h"
-#include "NeonWindow.h"
-#include "MessageWindow.h"
+//
 #include "Hashsum.h"
+#include "Kismet.h"
+#include "MessageWindow.h"
+#include "NeonWindow.h"
+
+#include <CommCtrl.h>
+#include <Mmsystem.h>
+#include <PathCch.h>
+#include <Prsht.h>
+#include <ShellScalingApi.h>
+#include <Shellapi.h>
+#include <Shlwapi.h>
+#include <Windowsx.h>
+#include <algorithm>
+#include <cctype>
+#include <commdlg.h>
+#include <cstdlib>
+#include <ppltasks.h>
 
 #ifndef HINST_THISCOMPONENT
 EXTERN_C IMAGE_DOS_HEADER __ImageBase;
@@ -464,9 +466,8 @@ inline bool HashsumAlgmCheck(int i, FilesumAlgw &aw) {
       WS_OVERLAPPED | WS_VISIBLE
 /// combobox style
 #define KWS_COMBOBOX                                                           \
-  WS_CHILDWINDOW | WS_CLIPSIBLINGS | WS_VISIBLE | WS_TABSTOP | \
-CBS_DROPDOWNLIST |            \
-      CBS_HASSTRINGS
+  WS_CHILDWINDOW | WS_CLIPSIBLINGS | WS_VISIBLE | WS_TABSTOP |                 \
+      CBS_DROPDOWNLIST | CBS_HASSTRINGS
 #define DEFAULT_PADDING96 20
 LRESULT NeonWindow::OnCreate(UINT nMsg, WPARAM wParam, LPARAM lParam,
                              BOOL &bHandle) {
@@ -788,8 +789,9 @@ LRESULT NeonWindow::Filesum(const std::wstring &file) {
         pg = (uint32_t)N;
         InvalidateRect(nullptr, FALSE);
       }
-      if (dwRead < AllocSingle::kInternalBufferSize)
+      if (dwRead < AllocSingle::kInternalBufferSize) {
         break;
+      }
     }
     CloseHandle(hFile);
     hash.clear();
@@ -836,41 +838,39 @@ static COLORREF CustColors[] = {
     RGB(255, 255, 255),
 };
 
-
-LRESULT NeonWindow::OnTheme(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL & bHandled)
-{
-	auto color = calcLuminance(ns.panelcolor);
-	CHOOSECOLOR co;
-	ZeroMemory(&co, sizeof(co));
-	co.lStructSize = sizeof(CHOOSECOLOR);
-	co.hwndOwner = m_hWnd;
-	co.lpCustColors = (LPDWORD)CustColors;
-	co.rgbResult = calcLuminance(ns.panelcolor);
-	co.lCustData = 0;
-	co.lpTemplateName = nullptr;
-	co.lpfnHook = nullptr;
-	co.Flags = CC_FULLOPEN | CC_RGBINIT;
-	if (ChooseColor(&co))
-	{
-		auto r = GetRValue(co.rgbResult);
-		auto g = GetGValue(co.rgbResult);
-		auto b = GetBValue(co.rgbResult);
-		ns.panelcolor = (r << 16) + (g << 8) + b;
-		UpdateTheme();
-		ApplyWindowSettings(ns);
-	}
-	return S_OK;
+LRESULT NeonWindow::OnTheme(WORD wNotifyCode, WORD wID, HWND hWndCtl,
+                            BOOL &bHandled) {
+  auto color = calcLuminance(ns.panelcolor);
+  CHOOSECOLORW co;
+  ZeroMemory(&co, sizeof(co));
+  co.lStructSize = sizeof(CHOOSECOLOR);
+  co.hwndOwner = m_hWnd;
+  co.lpCustColors = (LPDWORD)CustColors;
+  co.rgbResult = calcLuminance(ns.panelcolor);
+  co.lCustData = 0;
+  co.lpTemplateName = nullptr;
+  co.lpfnHook = nullptr;
+  co.Flags = CC_FULLOPEN | CC_RGBINIT;
+  if (ChooseColorW(&co)) {
+    auto r = GetRValue(co.rgbResult);
+    auto g = GetGValue(co.rgbResult);
+    auto b = GetBValue(co.rgbResult);
+    ns.panelcolor = (r << 16) + (g << 8) + b;
+    UpdateTheme();
+    ApplyWindowSettings(ns);
+  }
+  return S_OK;
 }
 
-LRESULT NeonWindow::OnAbout(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL & bHandled)
-{
-	MessageWindowEx(
-		m_hWnd,
-		L"About Kismet utilities",
-		L"Prerelease: 1.0.0.0\nCopyright \xA9 2018, Force Charlie. All Rights Reserved.",
-		L"For more information about this tool.\nVisit: <a href=\"http://forcemz.net/\">forcemz.net</a>",
-		kAboutWindow);
-	return S_OK;
+LRESULT NeonWindow::OnAbout(WORD wNotifyCode, WORD wID, HWND hWndCtl,
+                            BOOL &bHandled) {
+  MessageWindowEx(m_hWnd, L"About Kismet utilities",
+                  L"Prerelease: 1.0.0.0\nCopyright \xA9 2018, Force Charlie. "
+                  L"All Rights Reserved.",
+                  L"For more information about this tool.\nVisit: <a "
+                  L"href=\"https://forcemz.net/\">forcemz.net</a>",
+                  kAboutWindow);
+  return S_OK;
 }
 
 bool NeonWindow::CopyToClipboard(const std::wstring &text) {

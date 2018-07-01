@@ -94,53 +94,51 @@ size_t WriteFormatted(const wchar_t *data, size_t len);
 
 template <typename... Args>
 size_t PrintNone(const wchar_t *format, Args... args) {
-	std::wstring buffer;
-	size_t size = StringPrint(nullptr, 0, format, args...);
-	buffer.resize(size);
-	size = StringPrint(&buffer[0], buffer.size() + 1, format, args...);
-	return WriteFormatted(buffer.data(), size);
+  std::wstring buffer;
+  size_t size = StringPrint(nullptr, 0, format, args...);
+  buffer.resize(size);
+  size = StringPrint(&buffer[0], buffer.size() + 1, format, args...);
+  return WriteFormatted(buffer.data(), size);
 }
 
-class ProgressBar
-{
+class ProgressBar {
 public:
-	ProgressBar() {
-		text.reserve(256);
-	}
-	~ProgressBar() = default;
-	void Update(std::uint32_t N) {
-		size_t z = N / 2;
-		size_t k = 50 - z;
-		text.assign(L"\r[");
-		if (z > 0) {
-			text.append(z, '#');
-		}
-		if (N % 2 != 0) {
-			text.push_back('>');
-			k--;
-		}
-		if (k > 0) {
-			text.append(k, ' ');
-		}
-		text.append(L"] ").append(std::to_wstring(N)).append(L"% completed.");
-		WriteInternal(fc::Yellow,text.data(), text.size());
-	}
-	void Refresh() {
-		std::wstring buf(text.size(), ' ');
-		buf.front() = L'\r';
-		WriteFormatted(buf.data(), buf.size());
-	}
+  ProgressBar() { text.reserve(256); }
+  ~ProgressBar() = default;
+  void Update(std::uint32_t N) {
+    size_t z = N / 2;
+    size_t k = 50 - z;
+    text.assign(L"\r[");
+    if (z > 0) {
+      text.append(z, '#');
+    }
+    if (N % 2 != 0) {
+      text.push_back('>');
+      k--;
+    }
+    if (k > 0) {
+      text.append(k, ' ');
+    }
+    text.append(L"] ").append(std::to_wstring(N)).append(L"% completed.");
+    WriteInternal(fc::Yellow, text.data(), text.size());
+  }
+  void Refresh() {
+    std::wstring buf(text.size(), ' ');
+    buf.front() = L'\r';
+    WriteFormatted(buf.data(), buf.size());
+  }
+
 private:
-	std::wstring text;
+  std::wstring text;
 };
-//console::ProgressBar bar;
-//for (std::uint32_t i = 0; i <= 100; i++) {
+// console::ProgressBar bar;
+// for (std::uint32_t i = 0; i <= 100; i++) {
 //	bar.Update(i);
 //	Sleep(50);
 //}
-//bar.Refresh();
-//console::PrintNone(L"\rCompleted Progress..\n");
-}
+// bar.Refresh();
+// console::PrintNone(L"\rCompleted Progress..\n");
+} // namespace console
 //
 
 #endif

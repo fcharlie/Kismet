@@ -43,7 +43,7 @@ enum Color {
   Reset = 49
 };
 }
-}
+} // namespace vt
 
 bool TerminalsConvertColor(int color, TerminalsColorTable &co) {
 
@@ -226,16 +226,15 @@ int WriteInternal(int color, const wchar_t *buf, size_t len) {
   return provider.WriteRealize(color, buf, len);
 }
 
-size_t WriteFormatted(const wchar_t * data, size_t len)
-{
-	bool isvt = false;
-	auto hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-	if (IsWindowsConhost(hConsole, isvt)) {
-		DWORD dwWrite = 0;
-		WriteConsoleW(hConsole, data, (DWORD)len, &dwWrite, nullptr);
-		return dwWrite;
-	}
-	auto str = wchar2utf8(data, len);
-	return fwrite(str.c_str(), 1, str.size(), stdout);
+size_t WriteFormatted(const wchar_t *data, size_t len) {
+  bool isvt = false;
+  auto hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+  if (IsWindowsConhost(hConsole, isvt)) {
+    DWORD dwWrite = 0;
+    WriteConsoleW(hConsole, data, (DWORD)len, &dwWrite, nullptr);
+    return dwWrite;
+  }
+  auto str = wchar2utf8(data, len);
+  return fwrite(str.c_str(), 1, str.size(), stdout);
 }
-}
+} // namespace console

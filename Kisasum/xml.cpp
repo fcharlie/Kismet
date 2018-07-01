@@ -1,6 +1,6 @@
-#include<sstream>
-#include "kisasum.h"
 #include "console.hpp"
+#include "kisasum.h"
+#include <sstream>
 
 //<? xml version = "1.0">
 //<algorithm>md5</algorithm>
@@ -27,18 +27,18 @@
 */
 
 int KisasumPrintXML(const KisasumResult &result) {
-	std::wstring ws(LR"(<?xml version="1.0">)");
-	ws.append(L"\n<root>\n  <algorithm>")
-		.append(result.algorithm)
-		.append(L"</algorithm>\n  <files>\n");
-	for (const auto &e : result.elems) {
-		ws.append(L"    <file>\n      <name>")
-			.append(e.filename)
-			.append(L"</name>\n      <hash>")
-			.append(e.hash)
-			.append(L"</hash>\n    </file>\n");
-	}
-	ws.append(L"  </files>\n</root>\n");
-	console::WriteFormatted(ws.data(), ws.size());
-	return 0;
+  std::wstring ws(LR"(<?xml version="1.0">)");
+  ws.append(L"\n<root>\n  <algorithm>")
+      .append(result.algorithm)
+      .append(L"</algorithm>\n  <files>\n");
+  for (const auto &e : result.elems) {
+    ws.append(L"    <file>\n      <name>")
+        .append(e.filename)
+        .append(L"</name>\n      <hash>")
+        .append(e.hash)
+        .append(L"</hash>\n    </file>\n");
+  }
+  ws.append(L"  </files>\n</root>\n");
+  console::WriteFormatted(ws.data(), ws.size());
+  return 0;
 }
