@@ -7,7 +7,7 @@
 class AllocSingle {
 public:
   enum {
-    kInternalBufferSize = 65536,
+    kInternalBufferSize = 1024 * 1024,
   };
   AllocSingle(const AllocSingle &) = delete;
   AllocSingle &operator=(const AllocSingle &) = delete;
@@ -92,8 +92,8 @@ bool KisasumCaclulateElem(bool out, KisasumAlgorithm alm, int width,
   GetFileSizeEx(hFile, &li);
   elm.filename = PathFilename(file.data());
   DWORD dwRead;
-  int64_t cmsize = 0;
   console::ProgressBar pb;
+  pb.Initialize(li.QuadPart);
   std::shared_ptr<KisasumBase> sum(CreateKisasum(alm, width));
   for (;;) {
     if (!ReadFile(hFile, buffer, AllocSingle::kInternalBufferSize, &dwRead,
@@ -101,11 +101,9 @@ bool KisasumCaclulateElem(bool out, KisasumAlgorithm alm, int width,
       break;
     }
     sum->Update(buffer, dwRead);
-    cmsize += dwRead;
-    auto N = (uint32_t)(cmsize * 100 / li.QuadPart);
     if (out) {
       /// progress bar update.
-      pb.Update(N);
+      pb.Update(dwRead);
     }
     if (dwRead < AllocSingle::kInternalBufferSize)
       break;
