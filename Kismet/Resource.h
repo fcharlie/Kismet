@@ -5,11 +5,11 @@
 
 #define VERSIONSTRING "1.0.0.0"
 #define MAJORVER 1
-#define MINORVER 0
+#define MINORVER 1
 #define PATCHVER 0
 #define BUILDVER 0
 
-#define COPYRIGHT L"Copyright \xA9 2018 Force Charlie .All Rights Reserved."
+#define COPYRIGHT L"Copyright \xA9 2019 Force Charlie .All Rights Reserved."
 
 #define IDI_KISMET 101
 #define IDI_ICON_APP 102
